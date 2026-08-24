@@ -5,12 +5,16 @@
   "description": "متابعة المدارس — SUM × TREND",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "node build.js"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
     "pg": "^8.11.5"
+  },
+  "devDependencies": {
+    "@babel/standalone": "^7.23.5"
   }
 }

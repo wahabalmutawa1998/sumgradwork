@@ -62,7 +62,7 @@ const SEED = [{
   "active": true,
   "code": "6534",
   "type": "بنات",
-  "owner1": "فاطمة العبيدان",
+  "owner1": "فرح العبيدان",
   "owner2": "ريم البناي",
   "tasks": {
     "logo": "done",
@@ -139,7 +139,7 @@ const SEED = [{
   "code": "4325",
   "type": "بنات",
   "owner1": "ريم البناي",
-  "owner2": "فاطمة العبيدان",
+  "owner2": "فرح العبيدان",
   "tasks": {
     "logo": "done",
     "store": "done",
@@ -3787,7 +3787,7 @@ const SEED = [{
   "code": "",
   "type": "بنات",
   "owner1": "فاطمة الرويح",
-  "owner2": "فاطمة العبيدان",
+  "owner2": "فرح العبيدان",
   "tasks": {
     "logo": "wip",
     "store": "wip",
@@ -4047,7 +4047,7 @@ const SECTIONS = {
   print: 'المطبوعات'
 };
 const NEW_DAYS = 30;
-const TEAM0 = ['ريم البناي', 'فرح العنزي', 'فاطمة الرويح', 'مريم', 'لولو', 'سلمان الحجي', 'فاطمة العبيدان', 'فاطمة الشريدة', 'العمر', 'وهاب'];
+const TEAM0 = ['ريم البناي', 'فرح العنزي', 'فاطمة الرويح', 'مريم', 'لولو', 'سلمان الحجي', 'فرح العبيدان', 'فاطمة الشريدة', 'العمر', 'وهاب'];
 const CONFIG0 = {
   batches: [2027, 2028, 2029],
   types: ['بنات', 'شباب', 'خاص', '—'],
@@ -4240,19 +4240,37 @@ function fixProspect(p) {
     ...p
   };
 }
+const RENAMES = {
+  'فاطمة العبيدان': 'فرح العبيدان'
+};
+const ren = n => RENAMES[n] || n;
 function fixDb(d) {
   const cfg = {
     ...CONFIG0,
     ...(d.config || {})
   };
   cfg.customFields = cfg.customFields || [];
+  cfg.team = [...new Set((cfg.team || []).map(ren))];
+  const fixOwners = s => ({
+    ...s,
+    owner1: ren(s.owner1),
+    owner2: ren(s.owner2),
+    leftOwner1: ren(s.leftOwner1),
+    leftOwner2: ren(s.leftOwner2)
+  });
   return {
-    schools: (d.schools || []).map(s => fixSchool(s, cfg)),
+    schools: (d.schools || []).map(s => fixOwners(fixSchool(s, cfg))),
     config: cfg,
-    users: d.users || USERS0,
+    users: (d.users || USERS0).map(u => ({
+      ...u,
+      name: ren(u.name)
+    })),
     reqs: d.reqs || [],
     log: d.log || [],
-    prospects: (d.prospects || []).map(fixProspect)
+    prospects: (d.prospects || []).map(p => ({
+      ...fixProspect(p),
+      owner: ren(p.owner)
+    }))
   };
 }
 
@@ -4271,7 +4289,7 @@ function Fld({
     className: 'f' + (wide ? ' wide' : '')
   }, label ? /*#__PURE__*/React.createElement("label", null, label, pv.pending && /*#__PURE__*/React.createElement("em", {
     className: "pend"
-  }, "معلّق")) : null, area ? /*#__PURE__*/React.createElement("textarea", {
+  }, "\u0645\u0639\u0644\u0651\u0642")) : null, area ? /*#__PURE__*/React.createElement("textarea", {
     className: pv.pending ? 'pending' : '',
     value: pv.val || '',
     placeholder: ph,
@@ -4297,7 +4315,7 @@ function Sel({
     className: 'f' + (wide ? ' wide' : '')
   }, /*#__PURE__*/React.createElement("label", null, label, pv.pending && /*#__PURE__*/React.createElement("em", {
     className: "pend"
-  }, "معلّق")), /*#__PURE__*/React.createElement("select", {
+  }, "\u0645\u0639\u0644\u0651\u0642")), /*#__PURE__*/React.createElement("select", {
     className: pv.pending ? 'pending' : '',
     value: String(pv.val ?? ''),
     onChange: e => onChange(conv(e.target.value))
@@ -4318,7 +4336,7 @@ function Stars({
     className: 'star' + (i <= n ? ' on' : ''),
     title: ['مو مهمة', 'متوسطة', 'مهمة حيل'][i - 1],
     onClick: () => onSet(n === i ? 0 : i)
-  }, "★")));
+  }, "\u2605")));
 }
 function MultiFilter({
   label,
@@ -4342,7 +4360,7 @@ function MultiFilter({
   }, /*#__PURE__*/React.createElement("button", {
     className: 'mf-btn' + (value.length ? ' on' : ''),
     onClick: () => setOpen(!open)
-  }, label, value.length ? /*#__PURE__*/React.createElement("em", null, value.length) : null, /*#__PURE__*/React.createElement("i", null, "▾")), open && /*#__PURE__*/React.createElement("div", {
+  }, label, value.length ? /*#__PURE__*/React.createElement("em", null, value.length) : null, /*#__PURE__*/React.createElement("i", null, "\u25BE")), open && /*#__PURE__*/React.createElement("div", {
     className: "mf-pop"
   }, options.map(o => /*#__PURE__*/React.createElement("label", {
     key: o.v,
@@ -4354,7 +4372,7 @@ function MultiFilter({
   }), /*#__PURE__*/React.createElement("span", null, o.t))), value.length > 0 && /*#__PURE__*/React.createElement("button", {
     className: "mf-clr",
     onClick: () => onChange([])
-  }, "امسح")));
+  }, "\u0627\u0645\u0633\u062D")));
 }
 function LogLine({
   l,
@@ -4387,14 +4405,14 @@ function LogLine({
     className: "lfld"
   }, l.label), !['create', 'delete'].includes(l.kind) && /*#__PURE__*/React.createElement("span", {
     className: "lval"
-  }, /*#__PURE__*/React.createElement("s", null, from), /*#__PURE__*/React.createElement("i", null, "←"), /*#__PURE__*/React.createElement("b", null, to)), /*#__PURE__*/React.createElement("span", {
+  }, /*#__PURE__*/React.createElement("s", null, from), /*#__PURE__*/React.createElement("i", null, "\u2190"), /*#__PURE__*/React.createElement("b", null, to)), /*#__PURE__*/React.createElement("span", {
     className: 'lk k-' + l.kind
   }, kind), l.reviewedBy && /*#__PURE__*/React.createElement("span", {
     className: "lrev"
-  }, "بواسطة ", l.reviewedBy), revertable && /*#__PURE__*/React.createElement("button", {
+  }, "\u0628\u0648\u0627\u0633\u0637\u0629 ", l.reviewedBy), revertable && /*#__PURE__*/React.createElement("button", {
     className: "revbtn",
     onClick: () => onRevert(l)
-  }, "رجّعها"));
+  }, "\u0631\u062C\u0651\u0639\u0647\u0627"));
 }
 
 /* ---------- add-a-field dialog ---------- */
@@ -4433,26 +4451,26 @@ function AddField({
     "aria-modal": "true"
   }, /*#__PURE__*/React.createElement("div", {
     className: "modal-h"
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, "خانة جديدة"), /*#__PURE__*/React.createElement("span", null, "تنضاف لقسم «", SECTIONS[section], "»")), /*#__PURE__*/React.createElement("button", {
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, "\u062E\u0627\u0646\u0629 \u062C\u062F\u064A\u062F\u0629"), /*#__PURE__*/React.createElement("span", null, "\u062A\u0646\u0636\u0627\u0641 \u0644\u0642\u0633\u0645 \xAB", SECTIONS[section], "\xBB")), /*#__PURE__*/React.createElement("button", {
     className: "xbtn",
     onClick: onCancel
-  }, "×")), /*#__PURE__*/React.createElement("div", {
+  }, "\xD7")), /*#__PURE__*/React.createElement("div", {
     className: "modal-b"
   }, /*#__PURE__*/React.createElement("div", {
     className: "grid g1"
   }, /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "اسم الخانة"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0627\u0633\u0645 \u0627\u0644\u062E\u0627\u0646\u0629"), /*#__PURE__*/React.createElement("input", {
     autoFocus: true,
     value: t,
-    placeholder: "مثال: إيفنت القهوة",
+    placeholder: "\u0645\u062B\u0627\u0644: \u0625\u064A\u0641\u0646\u062A \u0627\u0644\u0642\u0647\u0648\u0629",
     onChange: e => {
       setT(e.target.value);
       setErr('');
     }
   })), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "نوعها"), /*#__PURE__*/React.createElement("select", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0646\u0648\u0639\u0647\u0627"), /*#__PURE__*/React.createElement("select", {
     value: type,
     onChange: e => setType(e.target.value)
   }, Object.entries(FTYPES).map(([k, v]) => /*#__PURE__*/React.createElement("option", {
@@ -4464,31 +4482,31 @@ function AddField({
     type: "checkbox",
     checked: counts,
     onChange: e => setCounts(e.target.checked)
-  }), " تُحسب بنسبة الإنجاز"), /*#__PURE__*/React.createElement("div", {
+  }), " \u062A\u064F\u062D\u0633\u0628 \u0628\u0646\u0633\u0628\u0629 \u0627\u0644\u0625\u0646\u062C\u0627\u0632"), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "وين تنضاف"), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0648\u064A\u0646 \u062A\u0646\u0636\u0627\u0641"), /*#__PURE__*/React.createElement("div", {
     className: "segs sm"
   }, /*#__PURE__*/React.createElement("button", {
     className: 'seg' + (scope === 'one' ? ' on' : ''),
     onClick: () => setScope('one')
-  }, "لهالمدرسة بس"), /*#__PURE__*/React.createElement("button", {
+  }, "\u0644\u0647\u0627\u0644\u0645\u062F\u0631\u0633\u0629 \u0628\u0633"), /*#__PURE__*/React.createElement("button", {
     className: 'seg' + (scope === 'all' ? ' on' : ''),
     onClick: () => setScope('all'),
     disabled: !isAdmin,
     title: isAdmin ? '' : 'للأدمن بس'
-  }, "لكل المدارس")), !isAdmin && /*#__PURE__*/React.createElement("div", {
+  }, "\u0644\u0643\u0644 \u0627\u0644\u0645\u062F\u0627\u0631\u0633")), !isAdmin && /*#__PURE__*/React.createElement("div", {
     className: "cbox-note"
-  }, "إضافة خانة لكل المدارس للأدمن بس.")))), /*#__PURE__*/React.createElement("div", {
+  }, "\u0625\u0636\u0627\u0641\u0629 \u062E\u0627\u0646\u0629 \u0644\u0643\u0644 \u0627\u0644\u0645\u062F\u0627\u0631\u0633 \u0644\u0644\u0623\u062F\u0645\u0646 \u0628\u0633.")))), /*#__PURE__*/React.createElement("div", {
     className: "modal-f"
   }, err && /*#__PURE__*/React.createElement("span", {
     className: "modal-err"
   }, err), /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: onCancel
-  }, "إلغاء"), /*#__PURE__*/React.createElement("button", {
+  }, "\u0625\u0644\u063A\u0627\u0621"), /*#__PURE__*/React.createElement("button", {
     className: "btn grad",
     onClick: go
-  }, "أضف"))));
+  }, "\u0623\u0636\u0641"))));
 }
 
 /* ---------- render one custom field ---------- */
@@ -4522,7 +4540,7 @@ function CustomField({
       className: "tnm"
     }, f.t, f.counts && /*#__PURE__*/React.createElement("em", {
       className: "cnt",
-      title: "تُحسب بالإنجاز"
+      title: "\u062A\u064F\u062D\u0633\u0628 \u0628\u0627\u0644\u0625\u0646\u062C\u0627\u0632"
     }, "%")), /*#__PURE__*/React.createElement("select", {
       className: pv.pending ? 'pending' : '',
       value: pv.val || (f.type === 'bool' ? '' : 'none'),
@@ -4533,18 +4551,18 @@ function CustomField({
     }, o.t))), canDrop && /*#__PURE__*/React.createElement("button", {
       className: "hidebtn",
       onClick: onDrop,
-      title: "شيل الخانة"
-    }, "×"));
+      title: "\u0634\u064A\u0644 \u0627\u0644\u062E\u0627\u0646\u0629"
+    }, "\xD7"));
   }
   return /*#__PURE__*/React.createElement("div", {
     className: "f"
   }, /*#__PURE__*/React.createElement("label", null, f.t, pv.pending && /*#__PURE__*/React.createElement("em", {
     className: "pend"
-  }, "معلّق"), canDrop && /*#__PURE__*/React.createElement("button", {
+  }, "\u0645\u0639\u0644\u0651\u0642"), canDrop && /*#__PURE__*/React.createElement("button", {
     className: "fdrop",
     onClick: onDrop,
-    title: "شيل الخانة"
-  }, "×")), /*#__PURE__*/React.createElement("input", {
+    title: "\u0634\u064A\u0644 \u0627\u0644\u062E\u0627\u0646\u0629"
+  }, "\xD7")), /*#__PURE__*/React.createElement("input", {
     className: (pv.pending ? 'pending ' : '') + (f.type === 'link' || f.type === 'num' ? 'ltr' : ''),
     type: f.type === 'num' ? 'text' : 'text',
     value: pv.val || '',
@@ -4558,8 +4576,8 @@ function AddFieldBtn({
   return /*#__PURE__*/React.createElement("button", {
     className: "addfield",
     onClick: onClick,
-    title: "أضف خانة جديدة"
-  }, "+ خانة");
+    title: "\u0623\u0636\u0641 \u062E\u0627\u0646\u0629 \u062C\u062F\u064A\u062F\u0629"
+  }, "+ \u062E\u0627\u0646\u0629");
 }
 function App() {
   const [db, setDb] = useState(null);
@@ -4676,7 +4694,7 @@ function App() {
   }, [undoS, redoS, me]);
   if (!db) return /*#__PURE__*/React.createElement("div", {
     className: "boot"
-  }, "يحمّل…");
+  }, "\u064A\u062D\u0645\u0651\u0644\u2026");
   if (!me) return /*#__PURE__*/React.createElement(Login, {
     users: db.users,
     onLogin: async u0 => {
@@ -4934,17 +4952,17 @@ function App() {
     disabled: !undoS.length,
     onClick: doUndo,
     title: undoS.length ? 'تراجع عن: ' + undoS[0].label : 'ما فيه شي ترجع عنه'
-  }, "↶"), /*#__PURE__*/React.createElement("button", {
+  }, "\u21B6"), /*#__PURE__*/React.createElement("button", {
     className: "ub",
     disabled: !redoS.length,
     onClick: doRedo,
     title: redoS.length ? 'أعد: ' + redoS[0].label : 'ما فيه شي تعيده'
-  }, "↷")), /*#__PURE__*/React.createElement("div", {
+  }, "\u21B7")), /*#__PURE__*/React.createElement("div", {
     className: "hu-txt"
   }, /*#__PURE__*/React.createElement("b", null, me.name), /*#__PURE__*/React.createElement("span", null, isAdmin ? 'أدمن — صلاحية كاملة' : 'موظف — التعديل يبي موافقة')), /*#__PURE__*/React.createElement("button", {
     className: "hu-out",
     onClick: logout
-  }, "خروج"))), /*#__PURE__*/React.createElement("nav", {
+  }, "\u062E\u0631\u0648\u062C"))), /*#__PURE__*/React.createElement("nav", {
     className: "nav"
   }, NAV.map(n => /*#__PURE__*/React.createElement("button", {
     key: n.k,
@@ -4954,13 +4972,13 @@ function App() {
     className: "bdg"
   }, n.badge) : null))), undoS.length > 0 && /*#__PURE__*/React.createElement("div", {
     className: "undobar"
-  }, "آخر شي سويته: ", /*#__PURE__*/React.createElement("b", null, undoS[0].label), /*#__PURE__*/React.createElement("button", {
+  }, "\u0622\u062E\u0631 \u0634\u064A \u0633\u0648\u064A\u062A\u0647: ", /*#__PURE__*/React.createElement("b", null, undoS[0].label), /*#__PURE__*/React.createElement("button", {
     onClick: doUndo
-  }, "تراجع"), /*#__PURE__*/React.createElement("span", {
+  }, "\u062A\u0631\u0627\u062C\u0639"), /*#__PURE__*/React.createElement("span", {
     className: "dim"
-  }, "أو ", navigator.platform.includes('Mac') ? '⌘Z' : 'Ctrl+Z')), !isAdmin && myPending.length > 0 && /*#__PURE__*/React.createElement("div", {
+  }, "\u0623\u0648 ", navigator.platform.includes('Mac') ? '⌘Z' : 'Ctrl+Z')), !isAdmin && myPending.length > 0 && /*#__PURE__*/React.createElement("div", {
     className: "notice"
-  }, "عندك ", /*#__PURE__*/React.createElement("b", null, myPending.length), " تعديل بانتظار موافقة الأدمن."), /*#__PURE__*/React.createElement("main", null, page === 'schools' && /*#__PURE__*/React.createElement(Schools, ctx), page === 'pipe' && /*#__PURE__*/React.createElement(Pipeline, ctx), page === 'reqs' && /*#__PURE__*/React.createElement(Requests, ctx), page === 'log' && /*#__PURE__*/React.createElement(LogPage, ctx), page === 'stats' && /*#__PURE__*/React.createElement(Stats, ctx), page === 'settings' && /*#__PURE__*/React.createElement(Settings, ctx)), toast && /*#__PURE__*/React.createElement("div", {
+  }, "\u0639\u0646\u062F\u0643 ", /*#__PURE__*/React.createElement("b", null, myPending.length), " \u062A\u0639\u062F\u064A\u0644 \u0628\u0627\u0646\u062A\u0638\u0627\u0631 \u0645\u0648\u0627\u0641\u0642\u0629 \u0627\u0644\u0623\u062F\u0645\u0646."), /*#__PURE__*/React.createElement("main", null, page === 'schools' && /*#__PURE__*/React.createElement(Schools, ctx), page === 'pipe' && /*#__PURE__*/React.createElement(Pipeline, ctx), page === 'reqs' && /*#__PURE__*/React.createElement(Requests, ctx), page === 'log' && /*#__PURE__*/React.createElement(LogPage, ctx), page === 'stats' && /*#__PURE__*/React.createElement(Stats, ctx), page === 'settings' && /*#__PURE__*/React.createElement(Settings, ctx)), toast && /*#__PURE__*/React.createElement("div", {
     className: "toast"
   }, toast));
 }
@@ -4992,11 +5010,11 @@ function Login({
     src: TRENDLOGO,
     alt: "TREND GRADUATION",
     className: "lg lg-tr"
-  })), /*#__PURE__*/React.createElement("h1", null, "متابعة المدارس"), /*#__PURE__*/React.createElement("p", null, "دخّل الكود حقك"), /*#__PURE__*/React.createElement("input", {
+  })), /*#__PURE__*/React.createElement("h1", null, "\u0645\u062A\u0627\u0628\u0639\u0629 \u0627\u0644\u0645\u062F\u0627\u0631\u0633"), /*#__PURE__*/React.createElement("p", null, "\u062F\u062E\u0651\u0644 \u0627\u0644\u0643\u0648\u062F \u062D\u0642\u0643"), /*#__PURE__*/React.createElement("input", {
     type: "password",
     inputMode: "numeric",
     className: "code",
-    placeholder: "••••",
+    placeholder: "\u2022\u2022\u2022\u2022",
     value: code,
     onChange: e => {
       setCode(e.target.value);
@@ -5009,7 +5027,7 @@ function Login({
   }, err), /*#__PURE__*/React.createElement("button", {
     className: "btn grad big",
     onClick: go
-  }, "دخول")));
+  }, "\u062F\u062E\u0648\u0644")));
 }
 function Schools(ctx) {
   const {
@@ -5227,33 +5245,33 @@ function Schools(ctx) {
       setBatch(b);
       setOpen(null);
     }
-  }, "دفعة ", /*#__PURE__*/React.createElement("span", {
+  }, "\u062F\u0641\u0639\u0629 ", /*#__PURE__*/React.createElement("span", {
     className: "num"
   }, b), /*#__PURE__*/React.createElement("em", null, db.schools.filter(s => s.batch === b && s.active !== false).length)))), /*#__PURE__*/React.createElement("div", {
     className: "cards"
   }, /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "مدارس معانا"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0645\u062F\u0627\u0631\u0633 \u0645\u0639\u0627\u0646\u0627"), /*#__PURE__*/React.createElement("b", {
     className: "num"
   }, live.length), /*#__PURE__*/React.createElement("i", null, goneN ? goneN + ' طلعت' : 'ما طلع أحد')), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "خلّصت كامل"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u062E\u0644\u0651\u0635\u062A \u0643\u0627\u0645\u0644"), /*#__PURE__*/React.createElement("b", {
     className: "num ok"
-  }, doneN), /*#__PURE__*/React.createElement("i", null, "من ", live.length)), /*#__PURE__*/React.createElement("div", {
+  }, doneN), /*#__PURE__*/React.createElement("i", null, "\u0645\u0646 ", live.length)), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "ما بدينا فيها"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0645\u0627 \u0628\u062F\u064A\u0646\u0627 \u0641\u064A\u0647\u0627"), /*#__PURE__*/React.createElement("b", {
     className: "num bad"
-  }, zeroN), /*#__PURE__*/React.createElement("i", null, "ولا مهمة")), /*#__PURE__*/React.createElement("div", {
+  }, zeroN), /*#__PURE__*/React.createElement("i", null, "\u0648\u0644\u0627 \u0645\u0647\u0645\u0629")), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "تنتظر تعيين"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u062A\u0646\u062A\u0638\u0631 \u062A\u0639\u064A\u064A\u0646"), /*#__PURE__*/React.createElement("b", {
     className: 'num' + (noOwn ? ' warn' : '')
-  }, noOwn), /*#__PURE__*/React.createElement("i", null, "بدون مسؤول")), /*#__PURE__*/React.createElement("div", {
+  }, noOwn), /*#__PURE__*/React.createElement("i", null, "\u0628\u062F\u0648\u0646 \u0645\u0633\u0624\u0648\u0644")), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "جديدة"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u062C\u062F\u064A\u062F\u0629"), /*#__PURE__*/React.createElement("b", {
     className: 'num' + (newN ? ' new' : '')
-  }, newN), /*#__PURE__*/React.createElement("i", null, "آخر ", NEW_DAYS, " يوم")), /*#__PURE__*/React.createElement("div", {
+  }, newN), /*#__PURE__*/React.createElement("i", null, "\u0622\u062E\u0631 ", NEW_DAYS, " \u064A\u0648\u0645")), /*#__PURE__*/React.createElement("div", {
     className: "kpi wide"
-  }, /*#__PURE__*/React.createElement("span", null, "إنجاز الدفعة"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0625\u0646\u062C\u0627\u0632 \u0627\u0644\u062F\u0641\u0639\u0629"), /*#__PURE__*/React.createElement("b", {
     className: "num"
   }, avg, "%"), /*#__PURE__*/React.createElement("div", {
     className: "pbar"
@@ -5263,19 +5281,19 @@ function Schools(ctx) {
     }
   })))), isAdmin && fullyDone.length > 0 && /*#__PURE__*/React.createElement("div", {
     className: "tip"
-  }, /*#__PURE__*/React.createElement("span", null, "خلصت عند كل المدارس النشطة:"), fullyDone.map(t => /*#__PURE__*/React.createElement("button", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u062E\u0644\u0635\u062A \u0639\u0646\u062F \u0643\u0644 \u0627\u0644\u0645\u062F\u0627\u0631\u0633 \u0627\u0644\u0646\u0634\u0637\u0629:"), fullyDone.map(t => /*#__PURE__*/React.createElement("button", {
     key: t.k,
     className: "tipbtn",
     onClick: () => hideTask(t.k)
-  }, "أخفِ ", t.t))), /*#__PURE__*/React.createElement("div", {
+  }, "\u0623\u062E\u0641\u0650 ", t.t))), /*#__PURE__*/React.createElement("div", {
     className: "bar"
   }, /*#__PURE__*/React.createElement("input", {
     className: "search",
-    placeholder: "دوّر باسم المدرسة، الكود، السلوقن، الفكرة، المسؤول…",
+    placeholder: "\u062F\u0648\u0651\u0631 \u0628\u0627\u0633\u0645 \u0627\u0644\u0645\u062F\u0631\u0633\u0629\u060C \u0627\u0644\u0643\u0648\u062F\u060C \u0627\u0644\u0633\u0644\u0648\u0642\u0646\u060C \u0627\u0644\u0641\u0643\u0631\u0629\u060C \u0627\u0644\u0645\u0633\u0624\u0648\u0644\u2026",
     value: q,
     onChange: e => setQ(e.target.value)
   }), /*#__PURE__*/React.createElement(MultiFilter, {
-    label: "الشركة",
+    label: "\u0627\u0644\u0634\u0631\u0643\u0629",
     value: fC,
     onChange: setFC,
     options: cfg.companies.map(c => ({
@@ -5283,7 +5301,7 @@ function Schools(ctx) {
       t: c
     }))
   }), /*#__PURE__*/React.createElement(MultiFilter, {
-    label: "النوع",
+    label: "\u0627\u0644\u0646\u0648\u0639",
     value: fT,
     onChange: setFT,
     options: cfg.types.map(t => ({
@@ -5291,7 +5309,7 @@ function Schools(ctx) {
       t
     }))
   }), /*#__PURE__*/React.createElement(MultiFilter, {
-    label: "المسؤول",
+    label: "\u0627\u0644\u0645\u0633\u0624\u0648\u0644",
     value: fO,
     onChange: setFO,
     options: owners.map(o => ({
@@ -5299,7 +5317,7 @@ function Schools(ctx) {
       t: o
     }))
   }), /*#__PURE__*/React.createElement(MultiFilter, {
-    label: "الأهمية",
+    label: "\u0627\u0644\u0623\u0647\u0645\u064A\u0629",
     value: fStar,
     onChange: setFStar,
     options: [{
@@ -5316,7 +5334,7 @@ function Schools(ctx) {
       t: 'ما تحددت'
     }]
   }), /*#__PURE__*/React.createElement(MultiFilter, {
-    label: "الحالة",
+    label: "\u0627\u0644\u062D\u0627\u0644\u0629",
     value: fS,
     onChange: setFS,
     options: [{
@@ -5356,24 +5374,24 @@ function Schools(ctx) {
     onChange: e => setSort(e.target.value)
   }, /*#__PURE__*/React.createElement("option", {
     value: "stars"
-  }, "الأهم أول"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0627\u0644\u0623\u0647\u0645 \u0623\u0648\u0644"), /*#__PURE__*/React.createElement("option", {
     value: "low"
-  }, "الأقل إنجازاً"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0627\u0644\u0623\u0642\u0644 \u0625\u0646\u062C\u0627\u0632\u0627\u064B"), /*#__PURE__*/React.createElement("option", {
     value: "high"
-  }, "الأكثر إنجازاً"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0627\u0644\u0623\u0643\u062B\u0631 \u0625\u0646\u062C\u0627\u0632\u0627\u064B"), /*#__PURE__*/React.createElement("option", {
     value: "newest"
-  }, "الأحدث انضماماً"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0627\u0644\u0623\u062D\u062F\u062B \u0627\u0646\u0636\u0645\u0627\u0645\u0627\u064B"), /*#__PURE__*/React.createElement("option", {
     value: "name"
-  }, "أبجدي"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0623\u0628\u062C\u062F\u064A"), /*#__PURE__*/React.createElement("option", {
     value: "order"
-  }, "ترتيب الملف")), isAdmin && /*#__PURE__*/React.createElement("button", {
+  }, "\u062A\u0631\u062A\u064A\u0628 \u0627\u0644\u0645\u0644\u0641")), isAdmin && /*#__PURE__*/React.createElement("button", {
     className: "btn grad",
     onClick: () => setAdding(true)
-  }, "+ مدرسة")), active > 0 && /*#__PURE__*/React.createElement("div", {
+  }, "+ \u0645\u062F\u0631\u0633\u0629")), active > 0 && /*#__PURE__*/React.createElement("div", {
     className: "chips"
   }, /*#__PURE__*/React.createElement("span", {
     className: "chips-l"
-  }, "مفعّل:"), [...fC, ...fT, ...fO, ...fStar.map(s => '★'.repeat(+s) || 'بدون نجوم'), ...fS].map((x, i) => /*#__PURE__*/React.createElement("em", {
+  }, "\u0645\u0641\u0639\u0651\u0644:"), [...fC, ...fT, ...fO, ...fStar.map(s => '★'.repeat(+s) || 'بدون نجوم'), ...fS].map((x, i) => /*#__PURE__*/React.createElement("em", {
     key: i
   }, x)), /*#__PURE__*/React.createElement("button", {
     onClick: () => {
@@ -5383,13 +5401,13 @@ function Schools(ctx) {
       setFS([]);
       setFStar([]);
     }
-  }, "مسح الكل"), /*#__PURE__*/React.createElement("span", {
+  }, "\u0645\u0633\u062D \u0627\u0644\u0643\u0644"), /*#__PURE__*/React.createElement("span", {
     className: "chips-n num"
   }, shown.length)), /*#__PURE__*/React.createElement("div", {
     className: "list"
   }, shown.length === 0 && /*#__PURE__*/React.createElement("div", {
     className: "empty"
-  }, /*#__PURE__*/React.createElement("b", null, "ما في نتايج"), "غيّر الفلاتر أو دوّر بكلمة ثانية."), shown.map(s => /*#__PURE__*/React.createElement(SchoolRow, {
+  }, /*#__PURE__*/React.createElement("b", null, "\u0645\u0627 \u0641\u064A \u0646\u062A\u0627\u064A\u062C"), "\u063A\u064A\u0651\u0631 \u0627\u0644\u0641\u0644\u0627\u062A\u0631 \u0623\u0648 \u062F\u0648\u0651\u0631 \u0628\u0643\u0644\u0645\u0629 \u062B\u0627\u0646\u064A\u0629."), shown.map(s => /*#__PURE__*/React.createElement(SchoolRow, {
     key: s.id,
     s: s,
     ctx: ctx,
@@ -5470,13 +5488,13 @@ function SchoolRow({
     className: 'num' + (b === s.batch ? ' cur' : '')
   }, String(b).slice(2)))), isNew && /*#__PURE__*/React.createElement("span", {
     className: "tag-new"
-  }, "جديدة · ", /*#__PURE__*/React.createElement("span", {
+  }, "\u062C\u062F\u064A\u062F\u0629 \xB7 ", /*#__PURE__*/React.createElement("span", {
     className: "num"
-  }, daysSince(s.joinedAt)), " يوم"), gone && /*#__PURE__*/React.createElement("span", {
+  }, daysSince(s.joinedAt)), " \u064A\u0648\u0645"), gone && /*#__PURE__*/React.createElement("span", {
     className: "tag-gone"
-  }, "طلعت", s.leftAt && /*#__PURE__*/React.createElement("span", {
+  }, "\u0637\u0644\u0639\u062A", s.leftAt && /*#__PURE__*/React.createElement("span", {
     className: "num"
-  }, " · ", fmtShort(s.leftAt))), /*#__PURE__*/React.createElement("span", {
+  }, " \xB7 ", fmtShort(s.leftAt))), /*#__PURE__*/React.createElement("span", {
     className: 'tag-staff ' + (Number(s.staffCount) === 2 ? 'two ' + (s.stronger || 'none') : 'one'),
     title: Number(s.staffCount) === 2 ? 'ستافين' + (s.otherCompany ? ' — الثاني مع ' + s.otherCompany : ' — ما حددنا شركة الثاني') + (s.stronger ? ' — ' + STRONG[s.stronger] : '') : 'ستاف واحد — احنا بس'
   }, /*#__PURE__*/React.createElement("i", {
@@ -5487,11 +5505,11 @@ function SchoolRow({
     className: "num"
   }, "#", s.code) : null, s.joinedAt ? /*#__PURE__*/React.createElement("span", {
     className: "joined num"
-  }, "معانا من ", fmtShort(s.joinedAt)) : null, s.slogan ? /*#__PURE__*/React.createElement("span", {
+  }, "\u0645\u0639\u0627\u0646\u0627 \u0645\u0646 ", fmtShort(s.joinedAt)) : null, s.slogan ? /*#__PURE__*/React.createElement("span", {
     className: "slg"
   }, s.slogan) : /*#__PURE__*/React.createElement("span", {
     className: "dim"
-  }, "بدون سلوقن"))), /*#__PURE__*/React.createElement("span", {
+  }, "\u0628\u062F\u0648\u0646 \u0633\u0644\u0648\u0642\u0646"))), /*#__PURE__*/React.createElement("span", {
     className: 'co co-' + (s.company === 'SUM' ? 'sum' : s.company === 'Trend' ? 'tr' : 'na')
   }, s.company), /*#__PURE__*/React.createElement("span", {
     className: "typ"
@@ -5510,29 +5528,29 @@ function SchoolRow({
     target: "_blank",
     rel: "noreferrer",
     className: "lnk ig",
-    title: "انستقرام"
+    title: "\u0627\u0646\u0633\u062A\u0642\u0631\u0627\u0645"
   }, "IG") : /*#__PURE__*/React.createElement("span", {
     className: "lnk off",
-    title: "ما فيه انستقرام"
+    title: "\u0645\u0627 \u0641\u064A\u0647 \u0627\u0646\u0633\u062A\u0642\u0631\u0627\u0645"
   }, "IG"), s.tiktok ? /*#__PURE__*/React.createElement("a", {
     href: ttUrl(s.tiktok),
     target: "_blank",
     rel: "noreferrer",
     className: "lnk tt",
-    title: "تيك توك"
+    title: "\u062A\u064A\u0643 \u062A\u0648\u0643"
   }, "TT") : /*#__PURE__*/React.createElement("span", {
     className: "lnk off",
-    title: "ما فيه تيك توك"
+    title: "\u0645\u0627 \u0641\u064A\u0647 \u062A\u064A\u0643 \u062A\u0648\u0643"
   }, "TT"), okUrl(s.drive) ? /*#__PURE__*/React.createElement("a", {
     href: s.drive,
     target: "_blank",
     rel: "noreferrer",
     className: "lnk dr",
-    title: "لوقو المدرسة"
-  }, "لوقو") : /*#__PURE__*/React.createElement("span", {
+    title: "\u0644\u0648\u0642\u0648 \u0627\u0644\u0645\u062F\u0631\u0633\u0629"
+  }, "\u0644\u0648\u0642\u0648") : /*#__PURE__*/React.createElement("span", {
     className: "lnk off",
-    title: "ما فيه لنك لوقو"
-  }, "لوقو")), /*#__PURE__*/React.createElement("button", {
+    title: "\u0645\u0627 \u0641\u064A\u0647 \u0644\u0646\u0643 \u0644\u0648\u0642\u0648"
+  }, "\u0644\u0648\u0642\u0648")), /*#__PURE__*/React.createElement("button", {
     className: "caret"
   }, open ? '▲' : '▼')), open && /*#__PURE__*/React.createElement("div", {
     className: "body"
@@ -5544,7 +5562,7 @@ function SchoolRow({
     onClick: () => setTab(k)
   }, t)), /*#__PURE__*/React.createElement("span", {
     className: "prog"
-  }, "الإنجاز ", /*#__PURE__*/React.createElement("b", {
+  }, "\u0627\u0644\u0625\u0646\u062C\u0627\u0632 ", /*#__PURE__*/React.createElement("b", {
     className: "num"
   }, progress, "%"))), tab === 'main' && /*#__PURE__*/React.createElement(MainTab, {
     s: s,
@@ -5570,7 +5588,7 @@ function SchoolRow({
   }, t.t), /*#__PURE__*/React.createElement("input", {
     className: P(t.k).pending ? 'pending' : '',
     value: P(t.k).val || '',
-    placeholder: "اكتب هنا…",
+    placeholder: "\u0627\u0643\u062A\u0628 \u0647\u0646\u0627\u2026",
     onChange: e => E(t.k, e.target.value, t.t)
   })) : /*#__PURE__*/React.createElement("div", {
     className: "trow",
@@ -5591,7 +5609,7 @@ function SchoolRow({
     value: k
   }, ST[k]))), isAdmin && /*#__PURE__*/React.createElement("button", {
     className: "hidebtn",
-    title: "أخفِ للفريق كله",
+    title: "\u0623\u062E\u0641\u0650 \u0644\u0644\u0641\u0631\u064A\u0642 \u0643\u0644\u0647",
     onClick: () => ctx.setDb(d => ({
       ...d,
       config: {
@@ -5602,7 +5620,7 @@ function SchoolRow({
         } : x)
       }
     }))
-  }, "أخفِ"))), fieldsOf(s, cfg, 'tasks').map(f => /*#__PURE__*/React.createElement(CustomField, {
+  }, "\u0623\u062E\u0641\u0650"))), fieldsOf(s, cfg, 'tasks').map(f => /*#__PURE__*/React.createElement(CustomField, {
     key: f.k,
     f: f,
     pv: P('custom.' + f.k),
@@ -5618,7 +5636,7 @@ function SchoolRow({
     onClick: () => setAddSec('tasks')
   }))), tab === 'print' && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "hint"
-  }, "المطبوعات ما تدخل بحسبة الإنجاز — شغل توصيل مو شغل إبداعي."), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0645\u0637\u0628\u0648\u0639\u0627\u062A \u0645\u0627 \u062A\u062F\u062E\u0644 \u0628\u062D\u0633\u0628\u0629 \u0627\u0644\u0625\u0646\u062C\u0627\u0632 \u2014 \u0634\u063A\u0644 \u062A\u0648\u0635\u064A\u0644 \u0645\u0648 \u0634\u063A\u0644 \u0625\u0628\u062F\u0627\u0639\u064A."), /*#__PURE__*/React.createElement("div", {
     className: "tgrid"
   }, cfg.printables.map(p => /*#__PURE__*/React.createElement("div", {
     className: "trow",
@@ -5629,7 +5647,7 @@ function SchoolRow({
     className: "tnm"
   }, p.t), p.qty && /*#__PURE__*/React.createElement("input", {
     className: "qty ltr",
-    placeholder: "العدد",
+    placeholder: "\u0627\u0644\u0639\u062F\u062F",
     value: P('bagsQty').val || '',
     onChange: e => E('bagsQty', e.target.value, 'عدد الأكياس')
   }), /*#__PURE__*/React.createElement("select", {
@@ -5657,7 +5675,7 @@ function SchoolRow({
     className: "loglist"
   }, myLog.length === 0 && /*#__PURE__*/React.createElement("div", {
     className: "hint"
-  }, "ما فيه تعديلات على هالمدرسة بعد."), myLog.slice(0, 60).map(l => /*#__PURE__*/React.createElement(LogLine, {
+  }, "\u0645\u0627 \u0641\u064A\u0647 \u062A\u0639\u062F\u064A\u0644\u0627\u062A \u0639\u0644\u0649 \u0647\u0627\u0644\u0645\u062F\u0631\u0633\u0629 \u0628\u0639\u062F."), myLog.slice(0, 60).map(l => /*#__PURE__*/React.createElement(LogLine, {
     key: l.id,
     l: l,
     onRevert: isAdmin ? revertLog : null
@@ -5690,19 +5708,19 @@ function MainTab({
     className: "mainpane"
   }, /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "بيانات المدرسة"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u0645\u062F\u0631\u0633\u0629"), /*#__PURE__*/React.createElement("div", {
     className: "grid g4"
   }, /*#__PURE__*/React.createElement(Fld, {
-    label: "اسم المدرسة",
+    label: "\u0627\u0633\u0645 \u0627\u0644\u0645\u062F\u0631\u0633\u0629",
     pv: P('name'),
     onChange: v => E('name', v, 'اسم المدرسة')
   }), /*#__PURE__*/React.createElement(Fld, {
-    label: "كود التطبيق",
+    label: "\u0643\u0648\u062F \u0627\u0644\u062A\u0637\u0628\u064A\u0642",
     pv: P('code'),
     ltr: true,
     onChange: v => E('code', v, 'كود التطبيق')
   }), /*#__PURE__*/React.createElement(Sel, {
-    label: "الشركة",
+    label: "\u0627\u0644\u0634\u0631\u0643\u0629",
     pv: P('company'),
     opts: cfg.companies.map(c => ({
       v: c,
@@ -5710,7 +5728,7 @@ function MainTab({
     })),
     onChange: v => E('company', v, 'الشركة')
   }), /*#__PURE__*/React.createElement(Sel, {
-    label: "النوع",
+    label: "\u0627\u0644\u0646\u0648\u0639",
     pv: P('type'),
     opts: cfg.types.map(t => ({
       v: t,
@@ -5730,10 +5748,10 @@ function MainTab({
     onClick: onAddField
   })), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "المسؤولون"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0645\u0633\u0624\u0648\u0644\u0648\u0646"), /*#__PURE__*/React.createElement("div", {
     className: "grid g2"
   }, /*#__PURE__*/React.createElement(OwnerPick, {
-    label: "المسؤول الأول",
+    label: "\u0627\u0644\u0645\u0633\u0624\u0648\u0644 \u0627\u0644\u0623\u0648\u0644",
     value: P('owner1').val,
     pending: P('owner1').pending,
     options: owners,
@@ -5742,7 +5760,7 @@ function MainTab({
     onAddPerson: isAdmin ? addPerson : null,
     onChange: v => E('owner1', v, 'المسؤول الأول')
   }), /*#__PURE__*/React.createElement(OwnerPick, {
-    label: "المسؤول الثاني",
+    label: "\u0627\u0644\u0645\u0633\u0624\u0648\u0644 \u0627\u0644\u062B\u0627\u0646\u064A",
     value: P('owner2').val,
     pending: P('owner2').pending,
     options: owners,
@@ -5752,24 +5770,24 @@ function MainTab({
     onChange: v => E('owner2', v, 'المسؤول الثاني')
   })), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "اللنكات"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0644\u0646\u0643\u0627\u062A"), /*#__PURE__*/React.createElement("div", {
     className: "grid g2"
   }, /*#__PURE__*/React.createElement(Fld, {
-    label: "لنك انستقرام",
+    label: "\u0644\u0646\u0643 \u0627\u0646\u0633\u062A\u0642\u0631\u0627\u0645",
     pv: P('instagram'),
-    ph: "@username أو اللنك كامل",
+    ph: "@username \u0623\u0648 \u0627\u0644\u0644\u0646\u0643 \u0643\u0627\u0645\u0644",
     ltr: true,
     onChange: v => E('instagram', v, 'لنك انستقرام')
   }), /*#__PURE__*/React.createElement(Fld, {
-    label: "لنك تيك توك",
+    label: "\u0644\u0646\u0643 \u062A\u064A\u0643 \u062A\u0648\u0643",
     pv: P('tiktok'),
-    ph: "@username أو اللنك كامل",
+    ph: "@username \u0623\u0648 \u0627\u0644\u0644\u0646\u0643 \u0643\u0627\u0645\u0644",
     ltr: true,
     onChange: v => E('tiktok', v, 'لنك تيك توك')
   }), /*#__PURE__*/React.createElement(Fld, {
-    label: "لنك لوقو المدرسة (درايف)",
+    label: "\u0644\u0646\u0643 \u0644\u0648\u0642\u0648 \u0627\u0644\u0645\u062F\u0631\u0633\u0629 (\u062F\u0631\u0627\u064A\u0641)",
     pv: P('drive'),
-    ph: "https://drive.google.com/…",
+    ph: "https://drive.google.com/\u2026",
     ltr: true,
     onChange: v => E('drive', v, 'لنك اللوقو')
   }), fieldsOf(s, cfg, 'links').map(f => /*#__PURE__*/React.createElement(CustomField, {
@@ -5785,10 +5803,10 @@ function MainTab({
     onClick: onAddLink
   })), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "الحالة والستاف"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u062D\u0627\u0644\u0629 \u0648\u0627\u0644\u0633\u062A\u0627\u0641"), /*#__PURE__*/React.createElement("div", {
     className: "grid g2"
   }, /*#__PURE__*/React.createElement(Sel, {
-    label: "حالة المدرسة",
+    label: "\u062D\u0627\u0644\u0629 \u0627\u0644\u0645\u062F\u0631\u0633\u0629",
     pv: P('active'),
     cast: "bool",
     opts: [{
@@ -5803,7 +5821,7 @@ function MainTab({
       toTxt: v ? 'معانا' : 'طلعت'
     })
   }), /*#__PURE__*/React.createElement(Sel, {
-    label: "عدد الستافات",
+    label: "\u0639\u062F\u062F \u0627\u0644\u0633\u062A\u0627\u0641\u0627\u062A",
     pv: P('staffCount'),
     cast: "num",
     opts: [{
@@ -5815,12 +5833,12 @@ function MainTab({
     }],
     onChange: v => E('staffCount', v, 'عدد الستافات')
   }), Number(s.staffCount) === 2 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Fld, {
-    label: "الستاف الثاني مع أي شركة",
+    label: "\u0627\u0644\u0633\u062A\u0627\u0641 \u0627\u0644\u062B\u0627\u0646\u064A \u0645\u0639 \u0623\u064A \u0634\u0631\u0643\u0629",
     pv: P('otherCompany'),
-    ph: "اكتب اسم الشركة",
+    ph: "\u0627\u0643\u062A\u0628 \u0627\u0633\u0645 \u0627\u0644\u0634\u0631\u0643\u0629",
     onChange: v => E('otherCompany', v, 'شركة الستاف الثاني')
   }), /*#__PURE__*/React.createElement(Sel, {
-    label: "منو أقوى",
+    label: "\u0645\u0646\u0648 \u0623\u0642\u0648\u0649",
     pv: P('stronger'),
     opts: [{
       v: '',
@@ -5841,45 +5859,45 @@ function MainTab({
     })
   }))), /*#__PURE__*/React.createElement("div", {
     className: "stamps"
-  }, /*#__PURE__*/React.createElement("span", null, "تاريخ الانضمام: ", /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u0627\u0646\u0636\u0645\u0627\u0645: ", /*#__PURE__*/React.createElement("b", {
     className: "num"
   }, s.joinedAt ? fmtShort(s.joinedAt) : 'من الملف الأصلي')), s.leftAt && /*#__PURE__*/React.createElement("span", {
     className: "out"
-  }, "تاريخ الخروج: ", /*#__PURE__*/React.createElement("b", {
+  }, "\u062A\u0627\u0631\u064A\u062E \u0627\u0644\u062E\u0631\u0648\u062C: ", /*#__PURE__*/React.createElement("b", {
     className: "num"
   }, fmtShort(s.leftAt))), isAdmin && !s.joinedAt && /*#__PURE__*/React.createElement("label", {
     className: "setjoin"
-  }, "حدّده يدوي", /*#__PURE__*/React.createElement("input", {
+  }, "\u062D\u062F\u0651\u062F\u0647 \u064A\u062F\u0648\u064A", /*#__PURE__*/React.createElement("input", {
     type: "date",
     className: "ltr",
     onChange: e => e.target.value && E('joinedAt', new Date(e.target.value + 'T12:00:00').toISOString(), 'تاريخ الانضمام')
   }))), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "المحتوى"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0645\u062D\u062A\u0648\u0649"), /*#__PURE__*/React.createElement("div", {
     className: "grid g2"
   }, /*#__PURE__*/React.createElement(Fld, {
-    label: "السلوقن",
+    label: "\u0627\u0644\u0633\u0644\u0648\u0642\u0646",
     pv: P('slogan'),
-    ph: "مثال: اثرنا باقي بريطه",
+    ph: "\u0645\u062B\u0627\u0644: \u0627\u062B\u0631\u0646\u0627 \u0628\u0627\u0642\u064A \u0628\u0631\u064A\u0637\u0647",
     onChange: v => E('slogan', v, 'السلوقن')
   }), /*#__PURE__*/React.createElement(Fld, {
-    label: "الفكرة",
+    label: "\u0627\u0644\u0641\u0643\u0631\u0629",
     pv: P('idea'),
-    ph: "مثال: كارتنق",
+    ph: "\u0645\u062B\u0627\u0644: \u0643\u0627\u0631\u062A\u0646\u0642",
     onChange: v => E('idea', v, 'الفكرة')
   })), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "ملاحظات"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0645\u0644\u0627\u062D\u0638\u0627\u062A"), /*#__PURE__*/React.createElement("div", {
     className: "grid g1"
   }, /*#__PURE__*/React.createElement(Fld, {
     label: "",
     pv: P('notes'),
     area: true,
-    ph: "أي شي لازم الفريق يدري عنه…",
+    ph: "\u0623\u064A \u0634\u064A \u0644\u0627\u0632\u0645 \u0627\u0644\u0641\u0631\u064A\u0642 \u064A\u062F\u0631\u064A \u0639\u0646\u0647\u2026",
     onChange: v => E('notes', v, 'ملاحظات')
   })), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "الدفعات اللي معانا فيها"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u062F\u0641\u0639\u0627\u062A \u0627\u0644\u0644\u064A \u0645\u0639\u0627\u0646\u0627 \u0641\u064A\u0647\u0627"), /*#__PURE__*/React.createElement("div", {
     className: "bedit"
   }, cfg.batches.map(b => {
     const on = batches.includes(b);
@@ -5893,12 +5911,12 @@ function MainTab({
   }), s.batchesOverride && /*#__PURE__*/React.createElement("button", {
     className: "bbtn reset",
     onClick: () => E('batchesOverride', null, 'الدفعات')
-  }, "رجّع التلقائي")), isAdmin && /*#__PURE__*/React.createElement("div", {
+  }, "\u0631\u062C\u0651\u0639 \u0627\u0644\u062A\u0644\u0642\u0627\u0626\u064A")), isAdmin && /*#__PURE__*/React.createElement("div", {
     className: "delrow"
   }, /*#__PURE__*/React.createElement("button", {
     className: "btn danger",
     onClick: del
-  }, "شيل المدرسة")));
+  }, "\u0634\u064A\u0644 \u0627\u0644\u0645\u062F\u0631\u0633\u0629")));
 }
 const BLANK_SCHOOL = {
   name: '',
@@ -5961,57 +5979,57 @@ function NewSchool({
     "aria-modal": "true"
   }, /*#__PURE__*/React.createElement("div", {
     className: "modal-h"
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, title || 'مدرسة جديدة'), /*#__PURE__*/React.createElement("span", null, "تنضاف لدفعة ", /*#__PURE__*/React.createElement("em", {
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, title || 'مدرسة جديدة'), /*#__PURE__*/React.createElement("span", null, "\u062A\u0646\u0636\u0627\u0641 \u0644\u062F\u0641\u0639\u0629 ", /*#__PURE__*/React.createElement("em", {
     className: "num"
   }, batch))), /*#__PURE__*/React.createElement("button", {
     className: "xbtn",
     onClick: onCancel
-  }, "×")), /*#__PURE__*/React.createElement("div", {
+  }, "\xD7")), /*#__PURE__*/React.createElement("div", {
     className: "modal-b"
   }, /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "بيانات المدرسة"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0628\u064A\u0627\u0646\u0627\u062A \u0627\u0644\u0645\u062F\u0631\u0633\u0629"), /*#__PURE__*/React.createElement("div", {
     className: "grid g4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "اسم المدرسة"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0627\u0633\u0645 \u0627\u0644\u0645\u062F\u0631\u0633\u0629"), /*#__PURE__*/React.createElement("input", {
     autoFocus: true,
     value: d.name,
-    placeholder: "مثال: الرقة",
+    placeholder: "\u0645\u062B\u0627\u0644: \u0627\u0644\u0631\u0642\u0629",
     onChange: e => set('name', e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "كود التطبيق"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0643\u0648\u062F \u0627\u0644\u062A\u0637\u0628\u064A\u0642"), /*#__PURE__*/React.createElement("input", {
     className: "ltr",
     value: d.code,
     onChange: e => set('code', e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "الشركة"), /*#__PURE__*/React.createElement("select", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0627\u0644\u0634\u0631\u0643\u0629"), /*#__PURE__*/React.createElement("select", {
     value: d.company,
     onChange: e => set('company', e.target.value)
   }, cfg.companies.map(c => /*#__PURE__*/React.createElement("option", {
     key: c
   }, c)))), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "النوع"), /*#__PURE__*/React.createElement("select", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0627\u0644\u0646\u0648\u0639"), /*#__PURE__*/React.createElement("select", {
     value: d.type,
     onChange: e => set('type', e.target.value)
   }, cfg.types.map(t => /*#__PURE__*/React.createElement("option", {
     key: t
   }, t))))), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "الأهمية"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0623\u0647\u0645\u064A\u0629"), /*#__PURE__*/React.createElement("div", {
     className: "starpick"
   }, /*#__PURE__*/React.createElement(Stars, {
     n: d.stars,
     onSet: v => set('stars', v)
   }), /*#__PURE__*/React.createElement("span", null, ['ما تحددت', 'مو مهمة', 'متوسطة', 'مهمة حيل'][d.stars])), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "المسؤولون"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0645\u0633\u0624\u0648\u0644\u0648\u0646"), /*#__PURE__*/React.createElement("div", {
     className: "grid g2"
   }, /*#__PURE__*/React.createElement(OwnerPick, {
-    label: "المسؤول الأول",
+    label: "\u0627\u0644\u0645\u0633\u0624\u0648\u0644 \u0627\u0644\u0623\u0648\u0644",
     value: d.owner1,
     options: owners,
     known: cfg.team,
@@ -6019,7 +6037,7 @@ function NewSchool({
     onAddPerson: addPerson,
     onChange: v => set('owner1', v)
   }), /*#__PURE__*/React.createElement(OwnerPick, {
-    label: "المسؤول الثاني",
+    label: "\u0627\u0644\u0645\u0633\u0624\u0648\u0644 \u0627\u0644\u062B\u0627\u0646\u064A",
     value: d.owner2,
     options: owners,
     known: cfg.team,
@@ -6028,86 +6046,86 @@ function NewSchool({
     onChange: v => set('owner2', v)
   })), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "اللنكات"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0644\u0646\u0643\u0627\u062A"), /*#__PURE__*/React.createElement("div", {
     className: "grid g2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "لنك انستقرام"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0644\u0646\u0643 \u0627\u0646\u0633\u062A\u0642\u0631\u0627\u0645"), /*#__PURE__*/React.createElement("input", {
     className: "ltr",
     value: d.instagram,
-    placeholder: "@username أو اللنك كامل",
+    placeholder: "@username \u0623\u0648 \u0627\u0644\u0644\u0646\u0643 \u0643\u0627\u0645\u0644",
     onChange: e => set('instagram', e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "لنك تيك توك"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0644\u0646\u0643 \u062A\u064A\u0643 \u062A\u0648\u0643"), /*#__PURE__*/React.createElement("input", {
     className: "ltr",
     value: d.tiktok,
-    placeholder: "@username أو اللنك كامل",
+    placeholder: "@username \u0623\u0648 \u0627\u0644\u0644\u0646\u0643 \u0643\u0627\u0645\u0644",
     onChange: e => set('tiktok', e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "لنك لوقو المدرسة (درايف)"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0644\u0646\u0643 \u0644\u0648\u0642\u0648 \u0627\u0644\u0645\u062F\u0631\u0633\u0629 (\u062F\u0631\u0627\u064A\u0641)"), /*#__PURE__*/React.createElement("input", {
     className: "ltr",
     value: d.drive,
-    placeholder: "https://drive.google.com/…",
+    placeholder: "https://drive.google.com/\u2026",
     onChange: e => set('drive', e.target.value)
   }))), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "الستاف"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0633\u062A\u0627\u0641"), /*#__PURE__*/React.createElement("div", {
     className: "grid g2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "عدد الستافات"), /*#__PURE__*/React.createElement("select", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0639\u062F\u062F \u0627\u0644\u0633\u062A\u0627\u0641\u0627\u062A"), /*#__PURE__*/React.createElement("select", {
     value: d.staffCount,
     onChange: e => set('staffCount', +e.target.value)
   }, /*#__PURE__*/React.createElement("option", {
     value: 1
-  }, "ستاف واحد"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0633\u062A\u0627\u0641 \u0648\u0627\u062D\u062F"), /*#__PURE__*/React.createElement("option", {
     value: 2
-  }, "ستافين"))), Number(d.staffCount) === 2 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "\u0633\u062A\u0627\u0641\u064A\u0646"))), Number(d.staffCount) === 2 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "الستاف الثاني مع أي شركة"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0627\u0644\u0633\u062A\u0627\u0641 \u0627\u0644\u062B\u0627\u0646\u064A \u0645\u0639 \u0623\u064A \u0634\u0631\u0643\u0629"), /*#__PURE__*/React.createElement("input", {
     value: d.otherCompany,
-    placeholder: "اكتب اسم الشركة",
+    placeholder: "\u0627\u0643\u062A\u0628 \u0627\u0633\u0645 \u0627\u0644\u0634\u0631\u0643\u0629",
     onChange: e => set('otherCompany', e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "منو أقوى"), /*#__PURE__*/React.createElement("select", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0645\u0646\u0648 \u0623\u0642\u0648\u0649"), /*#__PURE__*/React.createElement("select", {
     value: d.stronger,
     onChange: e => set('stronger', e.target.value)
   }, /*#__PURE__*/React.createElement("option", {
     value: ""
-  }, "— ما تحدد —"), /*#__PURE__*/React.createElement("option", {
+  }, "\u2014 \u0645\u0627 \u062A\u062D\u062F\u062F \u2014"), /*#__PURE__*/React.createElement("option", {
     value: "us"
-  }, "احنا أقوى"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0627\u062D\u0646\u0627 \u0623\u0642\u0648\u0649"), /*#__PURE__*/React.createElement("option", {
     value: "them"
-  }, "هم أقوى"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0647\u0645 \u0623\u0642\u0648\u0649"), /*#__PURE__*/React.createElement("option", {
     value: "even"
-  }, "متقاربين"))))), /*#__PURE__*/React.createElement("div", {
+  }, "\u0645\u062A\u0642\u0627\u0631\u0628\u064A\u0646"))))), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "المحتوى"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0645\u062D\u062A\u0648\u0649"), /*#__PURE__*/React.createElement("div", {
     className: "grid g2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "السلوقن"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0627\u0644\u0633\u0644\u0648\u0642\u0646"), /*#__PURE__*/React.createElement("input", {
     value: d.slogan,
-    placeholder: "مثال: اثرنا باقي بريطه",
+    placeholder: "\u0645\u062B\u0627\u0644: \u0627\u062B\u0631\u0646\u0627 \u0628\u0627\u0642\u064A \u0628\u0631\u064A\u0637\u0647",
     onChange: e => set('slogan', e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "الفكرة"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0627\u0644\u0641\u0643\u0631\u0629"), /*#__PURE__*/React.createElement("input", {
     value: d.idea,
-    placeholder: "مثال: كارتنق",
+    placeholder: "\u0645\u062B\u0627\u0644: \u0643\u0627\u0631\u062A\u0646\u0642",
     onChange: e => set('idea', e.target.value)
   }))), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "ملاحظات"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0645\u0644\u0627\u062D\u0638\u0627\u062A"), /*#__PURE__*/React.createElement("div", {
     className: "grid g1"
   }, /*#__PURE__*/React.createElement("div", {
     className: "f"
   }, /*#__PURE__*/React.createElement("textarea", {
     value: d.notes,
-    placeholder: "أي شي لازم الفريق يدري عنه…",
+    placeholder: "\u0623\u064A \u0634\u064A \u0644\u0627\u0632\u0645 \u0627\u0644\u0641\u0631\u064A\u0642 \u064A\u062F\u0631\u064A \u0639\u0646\u0647\u2026",
     onChange: e => set('notes', e.target.value)
   })))), /*#__PURE__*/React.createElement("div", {
     className: "modal-f"
@@ -6116,10 +6134,10 @@ function NewSchool({
   }, err), /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: onCancel
-  }, "إلغاء"), /*#__PURE__*/React.createElement("button", {
+  }, "\u0625\u0644\u063A\u0627\u0621"), /*#__PURE__*/React.createElement("button", {
     className: "btn grad",
     onClick: submit
-  }, "احفظ المدرسة"))));
+  }, "\u0627\u062D\u0641\u0638 \u0627\u0644\u0645\u062F\u0631\u0633\u0629"))));
 }
 function gcalUrl(p) {
   if (!p.meetingAt) return '';
@@ -6299,7 +6317,7 @@ function Pipeline(ctx) {
   const expected = db.prospects.filter(p => !p.won).reduce((a, p) => a + ((CHANCE[p.chance] || {}).p || 0) / 100, 0);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "phead"
-  }, /*#__PURE__*/React.createElement("h2", null, "مدارس محتملة"), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("h2", null, "\u0645\u062F\u0627\u0631\u0633 \u0645\u062D\u062A\u0645\u0644\u0629"), /*#__PURE__*/React.createElement("div", {
     className: "tabs2 plain"
   }, /*#__PURE__*/React.createElement("button", {
     className: tab === 'open' ? 'on' : '',
@@ -6307,7 +6325,7 @@ function Pipeline(ctx) {
       setTab('open');
       setOpen(null);
     }
-  }, "بالمفاوضات ", /*#__PURE__*/React.createElement("em", {
+  }, "\u0628\u0627\u0644\u0645\u0641\u0627\u0648\u0636\u0627\u062A ", /*#__PURE__*/React.createElement("em", {
     className: "num"
   }, openN)), /*#__PURE__*/React.createElement("button", {
     className: tab === 'won' ? 'on' : '',
@@ -6315,7 +6333,7 @@ function Pipeline(ctx) {
       setTab('won');
       setOpen(null);
     }
-  }, "وقّعوا ", /*#__PURE__*/React.createElement("em", {
+  }, "\u0648\u0642\u0651\u0639\u0648\u0627 ", /*#__PURE__*/React.createElement("em", {
     className: "num"
   }, wonN))), isAdmin && /*#__PURE__*/React.createElement("button", {
     className: "btn grad",
@@ -6323,29 +6341,29 @@ function Pipeline(ctx) {
       marginInlineStart: 'auto'
     },
     onClick: () => setAdding(true)
-  }, "+ مدرسة محتملة")), /*#__PURE__*/React.createElement("div", {
+  }, "+ \u0645\u062F\u0631\u0633\u0629 \u0645\u062D\u062A\u0645\u0644\u0629")), /*#__PURE__*/React.createElement("div", {
     className: "cards"
   }, /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "بالمفاوضات"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0628\u0627\u0644\u0645\u0641\u0627\u0648\u0636\u0627\u062A"), /*#__PURE__*/React.createElement("b", {
     className: "num"
-  }, openN), /*#__PURE__*/React.createElement("i", null, "مدرسة")), /*#__PURE__*/React.createElement("div", {
+  }, openN), /*#__PURE__*/React.createElement("i", null, "\u0645\u062F\u0631\u0633\u0629")), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "ميتنقات معلّقة"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0645\u064A\u062A\u0646\u0642\u0627\u062A \u0645\u0639\u0644\u0651\u0642\u0629"), /*#__PURE__*/React.createElement("b", {
     className: 'num' + (meetings ? ' warn' : '')
-  }, meetings), /*#__PURE__*/React.createElement("i", null, "ما قعدناها")), /*#__PURE__*/React.createElement("div", {
+  }, meetings), /*#__PURE__*/React.createElement("i", null, "\u0645\u0627 \u0642\u0639\u062F\u0646\u0627\u0647\u0627")), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "احتمالية عالية"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0627\u062D\u062A\u0645\u0627\u0644\u064A\u0629 \u0639\u0627\u0644\u064A\u0629"), /*#__PURE__*/React.createElement("b", {
     className: "num ok"
-  }, hot), /*#__PURE__*/React.createElement("i", null, "قوي أو شبه مؤكد")), /*#__PURE__*/React.createElement("div", {
+  }, hot), /*#__PURE__*/React.createElement("i", null, "\u0642\u0648\u064A \u0623\u0648 \u0634\u0628\u0647 \u0645\u0624\u0643\u062F")), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "متوقع نوقّع"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0645\u062A\u0648\u0642\u0639 \u0646\u0648\u0642\u0651\u0639"), /*#__PURE__*/React.createElement("b", {
     className: "num"
-  }, expected.toFixed(1)), /*#__PURE__*/React.createElement("i", null, "بحسب الاحتمالية")), /*#__PURE__*/React.createElement("div", {
+  }, expected.toFixed(1)), /*#__PURE__*/React.createElement("i", null, "\u0628\u062D\u0633\u0628 \u0627\u0644\u0627\u062D\u062A\u0645\u0627\u0644\u064A\u0629")), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "وقّعوا"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0648\u0642\u0651\u0639\u0648\u0627"), /*#__PURE__*/React.createElement("b", {
     className: "num ok"
-  }, wonN), /*#__PURE__*/React.createElement("i", null, "صاروا معانا"))), /*#__PURE__*/React.createElement("div", {
+  }, wonN), /*#__PURE__*/React.createElement("i", null, "\u0635\u0627\u0631\u0648\u0627 \u0645\u0639\u0627\u0646\u0627"))), /*#__PURE__*/React.createElement("div", {
     className: "list"
   }, list.length === 0 && /*#__PURE__*/React.createElement("div", {
     className: "empty"
@@ -6371,19 +6389,19 @@ function Pipeline(ctx) {
       className: "nm"
     }, p.name), p.won && /*#__PURE__*/React.createElement("span", {
       className: "tag-won"
-    }, "وقّعت", p.wonAt && /*#__PURE__*/React.createElement("span", {
+    }, "\u0648\u0642\u0651\u0639\u062A", p.wonAt && /*#__PURE__*/React.createElement("span", {
       className: "num"
-    }, " · ", fmtShort(p.wonAt))), !p.won && p.meetingSet && !p.meetingDone && p.meetingAt && /*#__PURE__*/React.createElement("span", {
+    }, " \xB7 ", fmtShort(p.wonAt))), !p.won && p.meetingSet && !p.meetingDone && p.meetingAt && /*#__PURE__*/React.createElement("span", {
       className: "tag-meet"
-    }, "ميتنق ", /*#__PURE__*/React.createElement("span", {
+    }, "\u0645\u064A\u062A\u0646\u0642 ", /*#__PURE__*/React.createElement("span", {
       className: "num"
     }, fmtShort(p.meetingAt))), !p.won && p.meetingDone && /*#__PURE__*/React.createElement("span", {
       className: "tag-met"
-    }, "قعدنا الميتنق")), /*#__PURE__*/React.createElement("div", {
+    }, "\u0642\u0639\u062F\u0646\u0627 \u0627\u0644\u0645\u064A\u062A\u0646\u0642")), /*#__PURE__*/React.createElement("div", {
       className: "sub"
-    }, p.source ? /*#__PURE__*/React.createElement("span", null, "عن طريق ", p.source) : /*#__PURE__*/React.createElement("span", {
+    }, p.source ? /*#__PURE__*/React.createElement("span", null, "\u0639\u0646 \u0637\u0631\u064A\u0642 ", p.source) : /*#__PURE__*/React.createElement("span", {
       className: "dim"
-    }, "ما ندري عن طريق منو"), p.notes ? /*#__PURE__*/React.createElement("span", {
+    }, "\u0645\u0627 \u0646\u062F\u0631\u064A \u0639\u0646 \u0637\u0631\u064A\u0642 \u0645\u0646\u0648"), p.notes ? /*#__PURE__*/React.createElement("span", {
       className: "slg"
     }, p.notes) : null)), /*#__PURE__*/React.createElement("span", {
       className: 'chance c-' + p.chance
@@ -6415,21 +6433,21 @@ function Pipeline(ctx) {
       className: "body"
     }, /*#__PURE__*/React.createElement("div", {
       className: "fsec"
-    }, "الأساسي"), /*#__PURE__*/React.createElement("div", {
+    }, "\u0627\u0644\u0623\u0633\u0627\u0633\u064A"), /*#__PURE__*/React.createElement("div", {
       className: "grid g2"
     }, /*#__PURE__*/React.createElement("div", {
       className: "f"
-    }, /*#__PURE__*/React.createElement("label", null, "اسم المدرسة"), /*#__PURE__*/React.createElement("input", {
+    }, /*#__PURE__*/React.createElement("label", null, "\u0627\u0633\u0645 \u0627\u0644\u0645\u062F\u0631\u0633\u0629"), /*#__PURE__*/React.createElement("input", {
       value: p.name,
       onChange: e => setP2(p, 'name', e.target.value, 'اسم المدرسة')
     })), /*#__PURE__*/React.createElement("div", {
       className: "f"
-    }, /*#__PURE__*/React.createElement("label", null, "عن طريق منو جايين؟"), /*#__PURE__*/React.createElement("input", {
+    }, /*#__PURE__*/React.createElement("label", null, "\u0639\u0646 \u0637\u0631\u064A\u0642 \u0645\u0646\u0648 \u062C\u0627\u064A\u064A\u0646\u061F"), /*#__PURE__*/React.createElement("input", {
       value: p.source,
-      placeholder: "اسم الشخص أو الجهة",
+      placeholder: "\u0627\u0633\u0645 \u0627\u0644\u0634\u062E\u0635 \u0623\u0648 \u0627\u0644\u062C\u0647\u0629",
       onChange: e => setP2(p, 'source', e.target.value, 'المصدر')
     })), /*#__PURE__*/React.createElement(OwnerPick, {
-      label: "المسؤول",
+      label: "\u0627\u0644\u0645\u0633\u0624\u0648\u0644",
       value: p.owner,
       options: owners,
       known: cfg.team,
@@ -6438,7 +6456,7 @@ function Pipeline(ctx) {
       onChange: v => setP2(p, 'owner', v, 'المسؤول')
     }), /*#__PURE__*/React.createElement("div", {
       className: "f"
-    }, /*#__PURE__*/React.createElement("label", null, "الاحتمالية"), /*#__PURE__*/React.createElement("div", {
+    }, /*#__PURE__*/React.createElement("label", null, "\u0627\u0644\u0627\u062D\u062A\u0645\u0627\u0644\u064A\u0629"), /*#__PURE__*/React.createElement("div", {
       className: "segs sm"
     }, Object.entries(CHANCE).map(([k, v]) => /*#__PURE__*/React.createElement("button", {
       key: k,
@@ -6446,93 +6464,93 @@ function Pipeline(ctx) {
       onClick: () => setP2(p, 'chance', k, 'الاحتمالية')
     }, v.t))))), /*#__PURE__*/React.createElement("div", {
       className: "fsec"
-    }, "الميتنق"), /*#__PURE__*/React.createElement("div", {
+    }, "\u0627\u0644\u0645\u064A\u062A\u0646\u0642"), /*#__PURE__*/React.createElement("div", {
       className: "grid g2"
     }, /*#__PURE__*/React.createElement("div", {
       className: "f"
-    }, /*#__PURE__*/React.createElement("label", null, "تحدد ميتنق؟"), /*#__PURE__*/React.createElement("select", {
+    }, /*#__PURE__*/React.createElement("label", null, "\u062A\u062D\u062F\u062F \u0645\u064A\u062A\u0646\u0642\u061F"), /*#__PURE__*/React.createElement("select", {
       value: p.meetingSet ? 'yes' : 'no',
       onChange: e => setP2(p, 'meetingSet', e.target.value === 'yes', 'تحديد ميتنق')
     }, /*#__PURE__*/React.createElement("option", {
       value: "no"
-    }, "لا"), /*#__PURE__*/React.createElement("option", {
+    }, "\u0644\u0627"), /*#__PURE__*/React.createElement("option", {
       value: "yes"
-    }, "إي"))), p.meetingSet && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    }, "\u0625\u064A"))), p.meetingSet && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "f"
-    }, /*#__PURE__*/React.createElement("label", null, "متى؟"), /*#__PURE__*/React.createElement("input", {
+    }, /*#__PURE__*/React.createElement("label", null, "\u0645\u062A\u0649\u061F"), /*#__PURE__*/React.createElement("input", {
       type: "datetime-local",
       className: "ltr",
       value: p.meetingAt ? p.meetingAt.slice(0, 16) : '',
       onChange: e => setP2(p, 'meetingAt', e.target.value ? new Date(e.target.value).toISOString() : '', 'موعد الميتنق')
     })), /*#__PURE__*/React.createElement("div", {
       className: "f"
-    }, /*#__PURE__*/React.createElement("label", null, "قعدنا الميتنق؟"), /*#__PURE__*/React.createElement("select", {
+    }, /*#__PURE__*/React.createElement("label", null, "\u0642\u0639\u062F\u0646\u0627 \u0627\u0644\u0645\u064A\u062A\u0646\u0642\u061F"), /*#__PURE__*/React.createElement("select", {
       value: p.meetingDone ? 'yes' : 'no',
       onChange: e => setP2(p, 'meetingDone', e.target.value === 'yes', 'حضور الميتنق')
     }, /*#__PURE__*/React.createElement("option", {
       value: "no"
-    }, "لا، لسا"), /*#__PURE__*/React.createElement("option", {
+    }, "\u0644\u0627\u060C \u0644\u0633\u0627"), /*#__PURE__*/React.createElement("option", {
       value: "yes"
-    }, "إي، قعدناه"))), /*#__PURE__*/React.createElement("div", {
+    }, "\u0625\u064A\u060C \u0642\u0639\u062F\u0646\u0627\u0647"))), /*#__PURE__*/React.createElement("div", {
       className: "f"
     }, /*#__PURE__*/React.createElement("label", null, "\xA0"), p.meetingAt ? /*#__PURE__*/React.createElement("a", {
       className: "btn gcal",
       href: gcalUrl(p),
       target: "_blank",
       rel: "noreferrer"
-    }, "أضفه لقوقل كالندر") : /*#__PURE__*/React.createElement("span", {
+    }, "\u0623\u0636\u0641\u0647 \u0644\u0642\u0648\u0642\u0644 \u0643\u0627\u0644\u0646\u062F\u0631") : /*#__PURE__*/React.createElement("span", {
       className: "hint sm"
-    }, "حدّد الموعد أول")))), /*#__PURE__*/React.createElement("div", {
+    }, "\u062D\u062F\u0651\u062F \u0627\u0644\u0645\u0648\u0639\u062F \u0623\u0648\u0644")))), /*#__PURE__*/React.createElement("div", {
       className: "fsec"
-    }, "اللنكات"), /*#__PURE__*/React.createElement("div", {
+    }, "\u0627\u0644\u0644\u0646\u0643\u0627\u062A"), /*#__PURE__*/React.createElement("div", {
       className: "grid g2"
     }, /*#__PURE__*/React.createElement("div", {
       className: "f"
-    }, /*#__PURE__*/React.createElement("label", null, "انستقرام"), /*#__PURE__*/React.createElement("input", {
+    }, /*#__PURE__*/React.createElement("label", null, "\u0627\u0646\u0633\u062A\u0642\u0631\u0627\u0645"), /*#__PURE__*/React.createElement("input", {
       className: "ltr",
       value: p.instagram,
       onChange: e => setP2(p, 'instagram', e.target.value, 'انستقرام')
     })), /*#__PURE__*/React.createElement("div", {
       className: "f"
-    }, /*#__PURE__*/React.createElement("label", null, "تيك توك"), /*#__PURE__*/React.createElement("input", {
+    }, /*#__PURE__*/React.createElement("label", null, "\u062A\u064A\u0643 \u062A\u0648\u0643"), /*#__PURE__*/React.createElement("input", {
       className: "ltr",
       value: p.tiktok,
       onChange: e => setP2(p, 'tiktok', e.target.value, 'تيك توك')
     })), /*#__PURE__*/React.createElement("div", {
       className: "f"
-    }, /*#__PURE__*/React.createElement("label", null, "لنك الدرايف"), /*#__PURE__*/React.createElement("input", {
+    }, /*#__PURE__*/React.createElement("label", null, "\u0644\u0646\u0643 \u0627\u0644\u062F\u0631\u0627\u064A\u0641"), /*#__PURE__*/React.createElement("input", {
       className: "ltr",
       value: p.drive,
       onChange: e => setP2(p, 'drive', e.target.value, 'الدرايف')
     }))), /*#__PURE__*/React.createElement("div", {
       className: "fsec"
-    }, "ملاحظات"), /*#__PURE__*/React.createElement("div", {
+    }, "\u0645\u0644\u0627\u062D\u0638\u0627\u062A"), /*#__PURE__*/React.createElement("div", {
       className: "grid g1"
     }, /*#__PURE__*/React.createElement("div", {
       className: "f"
     }, /*#__PURE__*/React.createElement("textarea", {
       value: p.notes,
-      placeholder: "أي شي عن المفاوضات…",
+      placeholder: "\u0623\u064A \u0634\u064A \u0639\u0646 \u0627\u0644\u0645\u0641\u0627\u0648\u0636\u0627\u062A\u2026",
       onChange: e => setP2(p, 'notes', e.target.value, 'ملاحظات')
     }))), /*#__PURE__*/React.createElement("div", {
       className: "fsec"
-    }, "صارت معانا؟"), p.won ? /*#__PURE__*/React.createElement("div", {
+    }, "\u0635\u0627\u0631\u062A \u0645\u0639\u0627\u0646\u0627\u061F"), p.won ? /*#__PURE__*/React.createElement("div", {
       className: "wonbox"
-    }, "وقّعت بتاريخ ", /*#__PURE__*/React.createElement("b", {
+    }, "\u0648\u0642\u0651\u0639\u062A \u0628\u062A\u0627\u0631\u064A\u062E ", /*#__PURE__*/React.createElement("b", {
       className: "num"
-    }, fmtShort(p.wonAt)), " — موجودة بالمدارس الحين.") : /*#__PURE__*/React.createElement("div", {
+    }, fmtShort(p.wonAt)), " \u2014 \u0645\u0648\u062C\u0648\u062F\u0629 \u0628\u0627\u0644\u0645\u062F\u0627\u0631\u0633 \u0627\u0644\u062D\u064A\u0646.") : /*#__PURE__*/React.createElement("div", {
       className: "addrow"
     }, /*#__PURE__*/React.createElement("button", {
       className: "btn grad",
       onClick: () => setWinning(p)
-    }, "إي — صارت معانا"), /*#__PURE__*/React.createElement("span", {
+    }, "\u0625\u064A \u2014 \u0635\u0627\u0631\u062A \u0645\u0639\u0627\u0646\u0627"), /*#__PURE__*/React.createElement("span", {
       className: "hint sm"
-    }, "بنسألك أي دفعة، وينتسجل تاريخ التوقيع تلقائياً وما ينشال.")), isAdmin && /*#__PURE__*/React.createElement("div", {
+    }, "\u0628\u0646\u0633\u0623\u0644\u0643 \u0623\u064A \u062F\u0641\u0639\u0629\u060C \u0648\u064A\u0646\u062A\u0633\u062C\u0644 \u062A\u0627\u0631\u064A\u062E \u0627\u0644\u062A\u0648\u0642\u064A\u0639 \u062A\u0644\u0642\u0627\u0626\u064A\u0627\u064B \u0648\u0645\u0627 \u064A\u0646\u0634\u0627\u0644.")), isAdmin && /*#__PURE__*/React.createElement("div", {
       className: "delrow"
     }, /*#__PURE__*/React.createElement("button", {
       className: "btn danger",
       onClick: () => delP(p)
-    }, "شيل المدرسة المحتملة"))));
+    }, "\u0634\u064A\u0644 \u0627\u0644\u0645\u062F\u0631\u0633\u0629 \u0627\u0644\u0645\u062D\u062A\u0645\u0644\u0629"))));
   })), adding && /*#__PURE__*/React.createElement(NewProspect, {
     cfg: cfg,
     owners: owners,
@@ -6565,10 +6583,10 @@ function PickBatch({
     className: "modal sm"
   }, /*#__PURE__*/React.createElement("div", {
     className: "modal-h"
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, "«", p.name, "» صارت معانا"), /*#__PURE__*/React.createElement("span", null, "اختر الدفعة اللي تنتقل لها")), /*#__PURE__*/React.createElement("button", {
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, "\xAB", p.name, "\xBB \u0635\u0627\u0631\u062A \u0645\u0639\u0627\u0646\u0627"), /*#__PURE__*/React.createElement("span", null, "\u0627\u062E\u062A\u0631 \u0627\u0644\u062F\u0641\u0639\u0629 \u0627\u0644\u0644\u064A \u062A\u0646\u062A\u0642\u0644 \u0644\u0647\u0627")), /*#__PURE__*/React.createElement("button", {
     className: "xbtn",
     onClick: onCancel
-  }, "×")), /*#__PURE__*/React.createElement("div", {
+  }, "\xD7")), /*#__PURE__*/React.createElement("div", {
     className: "modal-b"
   }, /*#__PURE__*/React.createElement("div", {
     className: "segs big"
@@ -6576,26 +6594,26 @@ function PickBatch({
     key: x,
     className: 'seg' + (b === x ? ' on' : ''),
     onClick: () => setB(x)
-  }, "دفعة ", /*#__PURE__*/React.createElement("span", {
+  }, "\u062F\u0641\u0639\u0629 ", /*#__PURE__*/React.createElement("span", {
     className: "num"
   }, x)))), /*#__PURE__*/React.createElement("div", {
     className: "hint",
     style: {
       marginTop: 14
     }
-  }, "بتنتقل لصفحة المدارس بدفعة ", /*#__PURE__*/React.createElement("b", {
+  }, "\u0628\u062A\u0646\u062A\u0642\u0644 \u0644\u0635\u0641\u062D\u0629 \u0627\u0644\u0645\u062F\u0627\u0631\u0633 \u0628\u062F\u0641\u0639\u0629 ", /*#__PURE__*/React.createElement("b", {
     className: "num"
-  }, b), " ببياناتها، وينتسجل تاريخ التوقيع", /*#__PURE__*/React.createElement("b", {
+  }, b), " \u0628\u0628\u064A\u0627\u0646\u0627\u062A\u0647\u0627\u060C \u0648\u064A\u0646\u062A\u0633\u062C\u0644 \u062A\u0627\u0631\u064A\u062E \u0627\u0644\u062A\u0648\u0642\u064A\u0639", /*#__PURE__*/React.createElement("b", {
     className: "num"
-  }, " ", fmtShort(new Date())), " ثابت ما ينشال.")), /*#__PURE__*/React.createElement("div", {
+  }, " ", fmtShort(new Date())), " \u062B\u0627\u0628\u062A \u0645\u0627 \u064A\u0646\u0634\u0627\u0644.")), /*#__PURE__*/React.createElement("div", {
     className: "modal-f"
   }, /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: onCancel
-  }, "إلغاء"), /*#__PURE__*/React.createElement("button", {
+  }, "\u0625\u0644\u063A\u0627\u0621"), /*#__PURE__*/React.createElement("button", {
     className: "btn grad",
     onClick: () => onPick(b)
-  }, "انقلها لدفعة ", b))));
+  }, "\u0627\u0646\u0642\u0644\u0647\u0627 \u0644\u062F\u0641\u0639\u0629 ", b))));
 }
 function NewProspect({
   cfg,
@@ -6644,29 +6662,29 @@ function NewProspect({
     className: "modal"
   }, /*#__PURE__*/React.createElement("div", {
     className: "modal-h"
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, "مدرسة محتملة"), /*#__PURE__*/React.createElement("span", null, "مدرسة نتفاوض وياها")), /*#__PURE__*/React.createElement("button", {
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("b", null, "\u0645\u062F\u0631\u0633\u0629 \u0645\u062D\u062A\u0645\u0644\u0629"), /*#__PURE__*/React.createElement("span", null, "\u0645\u062F\u0631\u0633\u0629 \u0646\u062A\u0641\u0627\u0648\u0636 \u0648\u064A\u0627\u0647\u0627")), /*#__PURE__*/React.createElement("button", {
     className: "xbtn",
     onClick: onCancel
-  }, "×")), /*#__PURE__*/React.createElement("div", {
+  }, "\xD7")), /*#__PURE__*/React.createElement("div", {
     className: "modal-b"
   }, /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "الأساسي"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0623\u0633\u0627\u0633\u064A"), /*#__PURE__*/React.createElement("div", {
     className: "grid g2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "اسم المدرسة"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0627\u0633\u0645 \u0627\u0644\u0645\u062F\u0631\u0633\u0629"), /*#__PURE__*/React.createElement("input", {
     autoFocus: true,
     value: d.name,
     onChange: e => set('name', e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "عن طريق منو جايين؟"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0639\u0646 \u0637\u0631\u064A\u0642 \u0645\u0646\u0648 \u062C\u0627\u064A\u064A\u0646\u061F"), /*#__PURE__*/React.createElement("input", {
     value: d.source,
-    placeholder: "اسم الشخص أو الجهة",
+    placeholder: "\u0627\u0633\u0645 \u0627\u0644\u0634\u062E\u0635 \u0623\u0648 \u0627\u0644\u062C\u0647\u0629",
     onChange: e => set('source', e.target.value)
   })), /*#__PURE__*/React.createElement(OwnerPick, {
-    label: "المسؤول",
+    label: "\u0627\u0644\u0645\u0633\u0624\u0648\u0644",
     value: d.owner,
     options: owners,
     known: cfg.team,
@@ -6675,7 +6693,7 @@ function NewProspect({
     onChange: v => set('owner', v)
   }), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "الاحتمالية"), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0627\u0644\u0627\u062D\u062A\u0645\u0627\u0644\u064A\u0629"), /*#__PURE__*/React.createElement("div", {
     className: "segs sm"
   }, Object.entries(CHANCE).map(([k, v]) => /*#__PURE__*/React.createElement("button", {
     key: k,
@@ -6683,67 +6701,67 @@ function NewProspect({
     onClick: () => set('chance', k)
   }, v.t))))), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "الميتنق"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0645\u064A\u062A\u0646\u0642"), /*#__PURE__*/React.createElement("div", {
     className: "grid g2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "تحدد ميتنق؟"), /*#__PURE__*/React.createElement("select", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u062A\u062D\u062F\u062F \u0645\u064A\u062A\u0646\u0642\u061F"), /*#__PURE__*/React.createElement("select", {
     value: d.meetingSet ? 'yes' : 'no',
     onChange: e => set('meetingSet', e.target.value === 'yes')
   }, /*#__PURE__*/React.createElement("option", {
     value: "no"
-  }, "لا"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0644\u0627"), /*#__PURE__*/React.createElement("option", {
     value: "yes"
-  }, "إي"))), d.meetingSet && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "\u0625\u064A"))), d.meetingSet && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "متى؟"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0645\u062A\u0649\u061F"), /*#__PURE__*/React.createElement("input", {
     type: "datetime-local",
     className: "ltr",
     value: d.meetingAt ? d.meetingAt.slice(0, 16) : '',
     onChange: e => set('meetingAt', e.target.value ? new Date(e.target.value).toISOString() : '')
   })), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "قعدنا الميتنق؟"), /*#__PURE__*/React.createElement("select", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0642\u0639\u062F\u0646\u0627 \u0627\u0644\u0645\u064A\u062A\u0646\u0642\u061F"), /*#__PURE__*/React.createElement("select", {
     value: d.meetingDone ? 'yes' : 'no',
     onChange: e => set('meetingDone', e.target.value === 'yes')
   }, /*#__PURE__*/React.createElement("option", {
     value: "no"
-  }, "لا، لسا"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0644\u0627\u060C \u0644\u0633\u0627"), /*#__PURE__*/React.createElement("option", {
     value: "yes"
-  }, "إي، قعدناه"))))), /*#__PURE__*/React.createElement("div", {
+  }, "\u0625\u064A\u060C \u0642\u0639\u062F\u0646\u0627\u0647"))))), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "اللنكات"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0644\u0646\u0643\u0627\u062A"), /*#__PURE__*/React.createElement("div", {
     className: "grid g2"
   }, /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "انستقرام"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0627\u0646\u0633\u062A\u0642\u0631\u0627\u0645"), /*#__PURE__*/React.createElement("input", {
     className: "ltr",
     value: d.instagram,
     placeholder: "@username",
     onChange: e => set('instagram', e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "تيك توك"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u062A\u064A\u0643 \u062A\u0648\u0643"), /*#__PURE__*/React.createElement("input", {
     className: "ltr",
     value: d.tiktok,
     placeholder: "@username",
     onChange: e => set('tiktok', e.target.value)
   })), /*#__PURE__*/React.createElement("div", {
     className: "f"
-  }, /*#__PURE__*/React.createElement("label", null, "لنك الدرايف"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0644\u0646\u0643 \u0627\u0644\u062F\u0631\u0627\u064A\u0641"), /*#__PURE__*/React.createElement("input", {
     className: "ltr",
     value: d.drive,
-    placeholder: "https://drive.google.com/…",
+    placeholder: "https://drive.google.com/\u2026",
     onChange: e => set('drive', e.target.value)
   }))), /*#__PURE__*/React.createElement("div", {
     className: "fsec"
-  }, "ملاحظات"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0645\u0644\u0627\u062D\u0638\u0627\u062A"), /*#__PURE__*/React.createElement("div", {
     className: "grid g1"
   }, /*#__PURE__*/React.createElement("div", {
     className: "f"
   }, /*#__PURE__*/React.createElement("textarea", {
     value: d.notes,
-    placeholder: "أي شي عن المفاوضات…",
+    placeholder: "\u0623\u064A \u0634\u064A \u0639\u0646 \u0627\u0644\u0645\u0641\u0627\u0648\u0636\u0627\u062A\u2026",
     onChange: e => set('notes', e.target.value)
   })))), /*#__PURE__*/React.createElement("div", {
     className: "modal-f"
@@ -6752,10 +6770,10 @@ function NewProspect({
   }, err), /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: onCancel
-  }, "إلغاء"), /*#__PURE__*/React.createElement("button", {
+  }, "\u0625\u0644\u063A\u0627\u0621"), /*#__PURE__*/React.createElement("button", {
     className: "btn grad",
     onClick: go
-  }, "احفظ"))));
+  }, "\u0627\u062D\u0641\u0638"))));
 }
 function Requests({
   db,
@@ -6782,7 +6800,7 @@ function Requests({
   const toggle = id => setSel(s => s.includes(id) ? s.filter(x => x !== id) : [...s, id]);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "phead"
-  }, /*#__PURE__*/React.createElement("h2", null, "طلبات التعديل"), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("h2", null, "\u0637\u0644\u0628\u0627\u062A \u0627\u0644\u062A\u0639\u062F\u064A\u0644"), /*#__PURE__*/React.createElement("div", {
     className: "tabs2 plain"
   }, /*#__PURE__*/React.createElement("button", {
     className: tab === 'pending' ? 'on' : '',
@@ -6790,7 +6808,7 @@ function Requests({
       setTab('pending');
       setSel([]);
     }
-  }, "معلّقة ", /*#__PURE__*/React.createElement("em", {
+  }, "\u0645\u0639\u0644\u0651\u0642\u0629 ", /*#__PURE__*/React.createElement("em", {
     className: "num"
   }, db.reqs.filter(r => r.status === 'pending').length)), /*#__PURE__*/React.createElement("button", {
     className: tab === 'past' ? 'on' : '',
@@ -6798,10 +6816,10 @@ function Requests({
       setTab('past');
       setSel([]);
     }
-  }, "سابقة"))), /*#__PURE__*/React.createElement("div", {
+  }, "\u0633\u0627\u0628\u0642\u0629"))), /*#__PURE__*/React.createElement("div", {
     className: "bar"
   }, /*#__PURE__*/React.createElement(MultiFilter, {
-    label: "الموظف",
+    label: "\u0627\u0644\u0645\u0648\u0638\u0641",
     value: fBy,
     onChange: setFBy,
     options: people.map(p => ({
@@ -6809,7 +6827,7 @@ function Requests({
       t: p
     }))
   }), /*#__PURE__*/React.createElement(MultiFilter, {
-    label: "المدرسة",
+    label: "\u0627\u0644\u0645\u062F\u0631\u0633\u0629",
     value: fSch,
     onChange: setFSch,
     options: schools.map(p => ({
@@ -6826,7 +6844,7 @@ function Requests({
       decide(sel, true);
       setSel([]);
     }
-  }, "وافق على المحدد ", sel.length ? '(' + sel.length + ')' : ''), /*#__PURE__*/React.createElement("button", {
+  }, "\u0648\u0627\u0641\u0642 \u0639\u0644\u0649 \u0627\u0644\u0645\u062D\u062F\u062F ", sel.length ? '(' + sel.length + ')' : ''), /*#__PURE__*/React.createElement("button", {
     className: "btn danger",
     disabled: !sel.length,
     onClick: () => {
@@ -6835,9 +6853,9 @@ function Requests({
       decide(sel, false, r);
       setSel([]);
     }
-  }, "ارفض المحدد"))), groups.length === 0 && /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0631\u0641\u0636 \u0627\u0644\u0645\u062D\u062F\u062F"))), groups.length === 0 && /*#__PURE__*/React.createElement("div", {
     className: "empty"
-  }, /*#__PURE__*/React.createElement("b", null, "ما فيه طلبات"), tab === 'pending' ? 'كل شي مراجَع.' : 'ما راجعت شي بعد.'), groups.map(([sid, g]) => /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("b", null, "\u0645\u0627 \u0641\u064A\u0647 \u0637\u0644\u0628\u0627\u062A"), tab === 'pending' ? 'كل شي مراجَع.' : 'ما راجعت شي بعد.'), groups.map(([sid, g]) => /*#__PURE__*/React.createElement("div", {
     className: "reqgrp",
     key: sid
   }, /*#__PURE__*/React.createElement("div", {
@@ -6846,10 +6864,10 @@ function Requests({
     className: "num"
   }, g.batch), /*#__PURE__*/React.createElement("span", {
     className: "num"
-  }, g.items.length, " طلب"), tab === 'pending' && /*#__PURE__*/React.createElement("button", {
+  }, g.items.length, " \u0637\u0644\u0628"), tab === 'pending' && /*#__PURE__*/React.createElement("button", {
     className: "btn ok sm",
     onClick: () => decide(g.items.map(r => r.id), true)
-  }, "وافق على الكل")), g.items.map(r => /*#__PURE__*/React.createElement("div", {
+  }, "\u0648\u0627\u0641\u0642 \u0639\u0644\u0649 \u0627\u0644\u0643\u0644")), g.items.map(r => /*#__PURE__*/React.createElement("div", {
     className: 'req' + (conflict(r) ? ' conflict' : ''),
     key: r.id
   }, tab === 'pending' && /*#__PURE__*/React.createElement("input", {
@@ -6864,22 +6882,22 @@ function Requests({
     className: "lfld"
   }, r.label), /*#__PURE__*/React.createElement("span", {
     className: "lval"
-  }, /*#__PURE__*/React.createElement("s", null, r.fromTxt ?? (r.from === '' ? '(فاضي)' : String(r.from))), /*#__PURE__*/React.createElement("i", null, "←"), /*#__PURE__*/React.createElement("b", null, r.toTxt ?? (r.to === '' ? '(فاضي)' : String(r.to)))), conflict(r) && /*#__PURE__*/React.createElement("span", {
+  }, /*#__PURE__*/React.createElement("s", null, r.fromTxt ?? (r.from === '' ? '(فاضي)' : String(r.from))), /*#__PURE__*/React.createElement("i", null, "\u2190"), /*#__PURE__*/React.createElement("b", null, r.toTxt ?? (r.to === '' ? '(فاضي)' : String(r.to)))), conflict(r) && /*#__PURE__*/React.createElement("span", {
     className: "warnpill"
-  }, "تعارض"), r.status === 'pending' ? /*#__PURE__*/React.createElement("span", {
+  }, "\u062A\u0639\u0627\u0631\u0636"), r.status === 'pending' ? /*#__PURE__*/React.createElement("span", {
     className: "reqacts"
   }, /*#__PURE__*/React.createElement("button", {
     className: "btn ok sm",
     onClick: () => decide([r.id], true)
-  }, "وافق"), /*#__PURE__*/React.createElement("button", {
+  }, "\u0648\u0627\u0641\u0642"), /*#__PURE__*/React.createElement("button", {
     className: "btn danger sm",
     onClick: () => {
       const x = prompt('سبب الرفض (اختياري)');
       if (x !== null) decide([r.id], false, x);
     }
-  }, "ارفض")) : /*#__PURE__*/React.createElement("span", {
+  }, "\u0627\u0631\u0641\u0636")) : /*#__PURE__*/React.createElement("span", {
     className: 'lk k-' + r.status
-  }, r.status === 'approved' ? 'موافق' : 'مرفوض', " ·", /*#__PURE__*/React.createElement("span", {
+  }, r.status === 'approved' ? 'موافق' : 'مرفوض', " \xB7", /*#__PURE__*/React.createElement("span", {
     className: "num"
   }, " ", fmtShort(r.reviewedAt)), r.reason ? ' · ' + r.reason : ''))))));
 }
@@ -6917,12 +6935,12 @@ function LogPage({
   };
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "phead"
-  }, /*#__PURE__*/React.createElement("h2", null, "سجل التغييرات"), /*#__PURE__*/React.createElement("span", {
+  }, /*#__PURE__*/React.createElement("h2", null, "\u0633\u062C\u0644 \u0627\u0644\u062A\u063A\u064A\u064A\u0631\u0627\u062A"), /*#__PURE__*/React.createElement("span", {
     className: "phead-n num"
   }, view.length)), /*#__PURE__*/React.createElement("div", {
     className: "bar"
   }, isAdmin && /*#__PURE__*/React.createElement(MultiFilter, {
-    label: "الموظف",
+    label: "\u0627\u0644\u0645\u0648\u0638\u0641",
     value: fBy,
     onChange: setFBy,
     options: people.map(p => ({
@@ -6930,7 +6948,7 @@ function LogPage({
       t: p
     }))
   }), /*#__PURE__*/React.createElement(MultiFilter, {
-    label: "المدرسة",
+    label: "\u0627\u0644\u0645\u062F\u0631\u0633\u0629",
     value: fSch,
     onChange: setFSch,
     options: schools.map(p => ({
@@ -6938,7 +6956,7 @@ function LogPage({
       t: p
     }))
   }), /*#__PURE__*/React.createElement(MultiFilter, {
-    label: "النوع",
+    label: "\u0627\u0644\u0646\u0648\u0639",
     value: fK,
     onChange: setFK,
     options: [{
@@ -6969,27 +6987,27 @@ function LogPage({
     onChange: e => setDays(e.target.value)
   }, /*#__PURE__*/React.createElement("option", {
     value: ""
-  }, "كل الفترات"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0643\u0644 \u0627\u0644\u0641\u062A\u0631\u0627\u062A"), /*#__PURE__*/React.createElement("option", {
     value: "1"
-  }, "آخر 24 ساعة"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0622\u062E\u0631 24 \u0633\u0627\u0639\u0629"), /*#__PURE__*/React.createElement("option", {
     value: "7"
-  }, "آخر 7 أيام"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0622\u062E\u0631 7 \u0623\u064A\u0627\u0645"), /*#__PURE__*/React.createElement("option", {
     value: "30"
-  }, "آخر 30 يوم")), /*#__PURE__*/React.createElement("button", {
+  }, "\u0622\u062E\u0631 30 \u064A\u0648\u0645")), /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: exp
-  }, "نزّل CSV")), /*#__PURE__*/React.createElement("div", {
+  }, "\u0646\u0632\u0651\u0644 CSV")), /*#__PURE__*/React.createElement("div", {
     className: "loglist page"
   }, view.length === 0 && /*#__PURE__*/React.createElement("div", {
     className: "empty"
-  }, /*#__PURE__*/React.createElement("b", null, "السجل فاضي"), "أول ما يصير تعديل بينكتب هني."), view.slice(0, 400).map(l => /*#__PURE__*/React.createElement(LogLine, {
+  }, /*#__PURE__*/React.createElement("b", null, "\u0627\u0644\u0633\u062C\u0644 \u0641\u0627\u0636\u064A"), "\u0623\u0648\u0644 \u0645\u0627 \u064A\u0635\u064A\u0631 \u062A\u0639\u062F\u064A\u0644 \u0628\u064A\u0646\u0643\u062A\u0628 \u0647\u0646\u064A."), view.slice(0, 400).map(l => /*#__PURE__*/React.createElement(LogLine, {
     key: l.id,
     l: l,
     showSchool: true,
     onRevert: isAdmin ? revertLog : null
   })), view.length > 400 && /*#__PURE__*/React.createElement("div", {
     className: "hint"
-  }, "معروض أول 400 — ضيّق الفلتر أو نزّل CSV.")));
+  }, "\u0645\u0639\u0631\u0648\u0636 \u0623\u0648\u0644 400 \u2014 \u0636\u064A\u0651\u0642 \u0627\u0644\u0641\u0644\u062A\u0631 \u0623\u0648 \u0646\u0632\u0651\u0644 CSV.")));
 }
 const tone = p => p >= 80 ? 'ok' : p >= 50 ? 'warn' : 'bad';
 function Detail({
@@ -7006,7 +7024,7 @@ function Detail({
     className: "num"
   }, list.length)), list.length === 0 && /*#__PURE__*/React.createElement("div", {
     className: "hint"
-  }, "ما عنده."), sorted.map(s => /*#__PURE__*/React.createElement("div", {
+  }, "\u0645\u0627 \u0639\u0646\u062F\u0647."), sorted.map(s => /*#__PURE__*/React.createElement("div", {
     className: "detrow",
     key: s.id
   }, /*#__PURE__*/React.createElement("span", null, s.name), /*#__PURE__*/React.createElement("em", {
@@ -7019,15 +7037,15 @@ function Stats(props) {
   const [view, setView] = useState('now');
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "phead"
-  }, /*#__PURE__*/React.createElement("h2", null, "الإحصائيات"), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("h2", null, "\u0627\u0644\u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A"), /*#__PURE__*/React.createElement("div", {
     className: "tabs2 plain"
   }, /*#__PURE__*/React.createElement("button", {
     className: view === 'now' ? 'on' : '',
     onClick: () => setView('now')
-  }, "الوضع الحالي"), /*#__PURE__*/React.createElement("button", {
+  }, "\u0627\u0644\u0648\u0636\u0639 \u0627\u0644\u062D\u0627\u0644\u064A"), /*#__PURE__*/React.createElement("button", {
     className: view === 'period' ? 'on' : '',
     onClick: () => setView('period')
-  }, "النشاط بالفترة"))), view === 'now' ? /*#__PURE__*/React.createElement(StatsNow, props) : /*#__PURE__*/React.createElement(StatsPeriod, props));
+  }, "\u0627\u0644\u0646\u0634\u0627\u0637 \u0628\u0627\u0644\u0641\u062A\u0631\u0629"))), view === 'now' ? /*#__PURE__*/React.createElement(StatsNow, props) : /*#__PURE__*/React.createElement(StatsPeriod, props));
 }
 function StatsNow({
   db
@@ -7067,35 +7085,35 @@ function StatsNow({
     className: "cards"
   }, /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "مدارس معانا"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0645\u062F\u0627\u0631\u0633 \u0645\u0639\u0627\u0646\u0627"), /*#__PURE__*/React.createElement("b", {
     className: "num"
-  }, live.length), /*#__PURE__*/React.createElement("i", null, "بكل الدفعات")), /*#__PURE__*/React.createElement("div", {
+  }, live.length), /*#__PURE__*/React.createElement("i", null, "\u0628\u0643\u0644 \u0627\u0644\u062F\u0641\u0639\u0627\u062A")), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "طلعت علينا"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0637\u0644\u0639\u062A \u0639\u0644\u064A\u0646\u0627"), /*#__PURE__*/React.createElement("b", {
     className: 'num' + (gone.length ? ' bad' : '')
-  }, gone.length), /*#__PURE__*/React.createElement("i", null, "كانت معانا")), /*#__PURE__*/React.createElement("div", {
+  }, gone.length), /*#__PURE__*/React.createElement("i", null, "\u0643\u0627\u0646\u062A \u0645\u0639\u0627\u0646\u0627")), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "جديدة"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u062C\u062F\u064A\u062F\u0629"), /*#__PURE__*/React.createElement("b", {
     className: 'num' + (fresh.length ? ' new' : '')
-  }, fresh.length), /*#__PURE__*/React.createElement("i", null, "آخر ", NEW_DAYS, " يوم")), /*#__PURE__*/React.createElement("div", {
+  }, fresh.length), /*#__PURE__*/React.createElement("i", null, "\u0622\u062E\u0631 ", NEW_DAYS, " \u064A\u0648\u0645")), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "تنتظر تعيين"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u062A\u0646\u062A\u0638\u0631 \u062A\u0639\u064A\u064A\u0646"), /*#__PURE__*/React.createElement("b", {
     className: 'num' + (unassigned.length ? ' warn' : '')
-  }, unassigned.length), /*#__PURE__*/React.createElement("i", null, "بدون مسؤول")), /*#__PURE__*/React.createElement("div", {
+  }, unassigned.length), /*#__PURE__*/React.createElement("i", null, "\u0628\u062F\u0648\u0646 \u0645\u0633\u0624\u0648\u0644")), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "عليها أول بس"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0639\u0644\u064A\u0647\u0627 \u0623\u0648\u0644 \u0628\u0633"), /*#__PURE__*/React.createElement("b", {
     className: "num"
-  }, solo.length), /*#__PURE__*/React.createElement("i", null, "ما لها ثاني")), /*#__PURE__*/React.createElement("div", {
+  }, solo.length), /*#__PURE__*/React.createElement("i", null, "\u0645\u0627 \u0644\u0647\u0627 \u062B\u0627\u0646\u064A")), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "مشتركة"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0645\u0634\u062A\u0631\u0643\u0629"), /*#__PURE__*/React.createElement("b", {
     className: "num"
-  }, shared.length), /*#__PURE__*/React.createElement("i", null, "ستافين"))), /*#__PURE__*/React.createElement("div", {
+  }, shared.length), /*#__PURE__*/React.createElement("i", null, "\u0633\u062A\u0627\u0641\u064A\u0646"))), /*#__PURE__*/React.createElement("div", {
     className: "sect"
-  }, "توزيع الشغل على الفريق"), /*#__PURE__*/React.createElement("div", {
+  }, "\u062A\u0648\u0632\u064A\u0639 \u0627\u0644\u0634\u063A\u0644 \u0639\u0644\u0649 \u0627\u0644\u0641\u0631\u064A\u0642"), /*#__PURE__*/React.createElement("div", {
     className: "sttable"
   }, /*#__PURE__*/React.createElement("div", {
     className: "sthead nw"
-  }, /*#__PURE__*/React.createElement("span", null, "الموظف"), /*#__PURE__*/React.createElement("span", null, "مسؤول أول"), /*#__PURE__*/React.createElement("span", null, "مسؤول ثاني"), /*#__PURE__*/React.createElement("span", null, "المجموع"), /*#__PURE__*/React.createElement("span", null, "إنجازه كأول"), /*#__PURE__*/React.createElement("span", null, "إنجازه كثاني"), /*#__PURE__*/React.createElement("span", null, "طلعت عليه"), /*#__PURE__*/React.createElement("span", null)), rows.map(r => /*#__PURE__*/React.createElement(React.Fragment, {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0627\u0644\u0645\u0648\u0638\u0641"), /*#__PURE__*/React.createElement("span", null, "\u0645\u0633\u0624\u0648\u0644 \u0623\u0648\u0644"), /*#__PURE__*/React.createElement("span", null, "\u0645\u0633\u0624\u0648\u0644 \u062B\u0627\u0646\u064A"), /*#__PURE__*/React.createElement("span", null, "\u0627\u0644\u0645\u062C\u0645\u0648\u0639"), /*#__PURE__*/React.createElement("span", null, "\u0625\u0646\u062C\u0627\u0632\u0647 \u0643\u0623\u0648\u0644"), /*#__PURE__*/React.createElement("span", null, "\u0625\u0646\u062C\u0627\u0632\u0647 \u0643\u062B\u0627\u0646\u064A"), /*#__PURE__*/React.createElement("span", null, "\u0637\u0644\u0639\u062A \u0639\u0644\u064A\u0647"), /*#__PURE__*/React.createElement("span", null)), rows.map(r => /*#__PURE__*/React.createElement(React.Fragment, {
     key: r.name
   }, /*#__PURE__*/React.createElement("div", {
     className: 'strow nw' + (pick === r.name ? ' on' : ''),
@@ -7125,11 +7143,11 @@ function StatsNow({
   }, pick === r.name ? '▲' : '▼')), pick === r.name && /*#__PURE__*/React.createElement("div", {
     className: "stdet"
   }, /*#__PURE__*/React.createElement(Detail, {
-    title: "مسؤول أول",
+    title: "\u0645\u0633\u0624\u0648\u0644 \u0623\u0648\u0644",
     list: r.a,
     prog: prog
   }), /*#__PURE__*/React.createElement(Detail, {
-    title: "مسؤول ثاني",
+    title: "\u0645\u0633\u0624\u0648\u0644 \u062B\u0627\u0646\u064A",
     list: r.b,
     prog: prog
   }), (r.g1.length > 0 || r.g2.length > 0) && /*#__PURE__*/React.createElement("div", {
@@ -7139,7 +7157,7 @@ function StatsNow({
     }
   }, /*#__PURE__*/React.createElement("div", {
     className: "detttl"
-  }, "مدارس طلعت وهو ماسكها ", /*#__PURE__*/React.createElement("em", {
+  }, "\u0645\u062F\u0627\u0631\u0633 \u0637\u0644\u0639\u062A \u0648\u0647\u0648 \u0645\u0627\u0633\u0643\u0647\u0627 ", /*#__PURE__*/React.createElement("em", {
     className: "num"
   }, r.lost)), r.g1.map(s => /*#__PURE__*/React.createElement("div", {
     className: "detrow",
@@ -7148,7 +7166,7 @@ function StatsNow({
     className: "num"
   }, s.batch), /*#__PURE__*/React.createElement("b", {
     className: "tagx"
-  }, "مسؤول أول"), /*#__PURE__*/React.createElement("span", {
+  }, "\u0645\u0633\u0624\u0648\u0644 \u0623\u0648\u0644"), /*#__PURE__*/React.createElement("span", {
     className: "num dim"
   }, s.leftAt ? fmtShort(s.leftAt) : 'من الملف'))), r.g2.map(s => /*#__PURE__*/React.createElement("div", {
     className: "detrow",
@@ -7157,11 +7175,11 @@ function StatsNow({
     className: "num"
   }, s.batch), /*#__PURE__*/React.createElement("b", {
     className: "tagx"
-  }, "مسؤول ثاني"), /*#__PURE__*/React.createElement("span", {
+  }, "\u0645\u0633\u0624\u0648\u0644 \u062B\u0627\u0646\u064A"), /*#__PURE__*/React.createElement("span", {
     className: "num dim"
   }, s.leftAt ? fmtShort(s.leftAt) : 'من الملف')))))))), gone.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "sect"
-  }, "مدارس طلعت علينا ", /*#__PURE__*/React.createElement("em", {
+  }, "\u0645\u062F\u0627\u0631\u0633 \u0637\u0644\u0639\u062A \u0639\u0644\u064A\u0646\u0627 ", /*#__PURE__*/React.createElement("em", {
     className: "num"
   }, gone.length)), /*#__PURE__*/React.createElement("div", {
     className: "waitlist"
@@ -7176,13 +7194,13 @@ function StatsNow({
     className: "wnote num"
   }, s.leftAt ? fmtShort(s.leftAt) : 'من الملف الأصلي'))))), /*#__PURE__*/React.createElement("div", {
     className: "sect"
-  }, "مدارس تنتظر تعيين ", /*#__PURE__*/React.createElement("em", {
+  }, "\u0645\u062F\u0627\u0631\u0633 \u062A\u0646\u062A\u0638\u0631 \u062A\u0639\u064A\u064A\u0646 ", /*#__PURE__*/React.createElement("em", {
     className: "num"
   }, unassigned.length)), /*#__PURE__*/React.createElement("div", {
     className: "waitlist"
   }, unassigned.length === 0 && /*#__PURE__*/React.createElement("div", {
     className: "hint"
-  }, "كل المدارس عليها مسؤول."), unassigned.map(s => /*#__PURE__*/React.createElement("div", {
+  }, "\u0643\u0644 \u0627\u0644\u0645\u062F\u0627\u0631\u0633 \u0639\u0644\u064A\u0647\u0627 \u0645\u0633\u0624\u0648\u0644."), unassigned.map(s => /*#__PURE__*/React.createElement("div", {
     className: "wait",
     key: s.id
   }, /*#__PURE__*/React.createElement("b", null, s.name), /*#__PURE__*/React.createElement("em", {
@@ -7352,12 +7370,12 @@ function StatsPeriod({
     onClick: () => setRange(k)
   }, t))), range === 'custom' && /*#__PURE__*/React.createElement("div", {
     className: "daterange"
-  }, /*#__PURE__*/React.createElement("label", null, "من"), /*#__PURE__*/React.createElement("input", {
+  }, /*#__PURE__*/React.createElement("label", null, "\u0645\u0646"), /*#__PURE__*/React.createElement("input", {
     type: "date",
     className: "ltr",
     value: from,
     onChange: e => setFrom(e.target.value)
-  }), /*#__PURE__*/React.createElement("label", null, "إلى"), /*#__PURE__*/React.createElement("input", {
+  }), /*#__PURE__*/React.createElement("label", null, "\u0625\u0644\u0649"), /*#__PURE__*/React.createElement("input", {
     type: "date",
     className: "ltr",
     value: to,
@@ -7366,33 +7384,33 @@ function StatsPeriod({
     className: "cards"
   }, /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "تعديلات انطبقت"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u062A\u0639\u062F\u064A\u0644\u0627\u062A \u0627\u0646\u0637\u0628\u0642\u062A"), /*#__PURE__*/React.createElement("b", {
     className: "num"
   }, applied.length), /*#__PURE__*/React.createElement("i", null, rejected.length ? rejected.length + ' مرفوض' : 'ما فيه مرفوض')), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "مهام خلّصت"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0645\u0647\u0627\u0645 \u062E\u0644\u0651\u0635\u062A"), /*#__PURE__*/React.createElement("b", {
     className: "num ok"
-  }, doneTotal), /*#__PURE__*/React.createElement("i", null, "بهالفترة")), /*#__PURE__*/React.createElement("div", {
+  }, doneTotal), /*#__PURE__*/React.createElement("i", null, "\u0628\u0647\u0627\u0644\u0641\u062A\u0631\u0629")), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "موظفين اشتغلوا"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0645\u0648\u0638\u0641\u064A\u0646 \u0627\u0634\u062A\u063A\u0644\u0648\u0627"), /*#__PURE__*/React.createElement("b", {
     className: "num"
-  }, activeP), /*#__PURE__*/React.createElement("i", null, "من ", cfg.team.length)), /*#__PURE__*/React.createElement("div", {
+  }, activeP), /*#__PURE__*/React.createElement("i", null, "\u0645\u0646 ", cfg.team.length)), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "مدارس اتحركت"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0645\u062F\u0627\u0631\u0633 \u0627\u062A\u062D\u0631\u0643\u062A"), /*#__PURE__*/React.createElement("b", {
     className: "num"
-  }, moved), /*#__PURE__*/React.createElement("i", null, "تقدّم إنجازها")), /*#__PURE__*/React.createElement("div", {
+  }, moved), /*#__PURE__*/React.createElement("i", null, "\u062A\u0642\u062F\u0651\u0645 \u0625\u0646\u062C\u0627\u0632\u0647\u0627")), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "مدارس انضمت"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0645\u062F\u0627\u0631\u0633 \u0627\u0646\u0636\u0645\u062A"), /*#__PURE__*/React.createElement("b", {
     className: 'num' + (joined.length ? ' ok' : '')
   }, joined.length), /*#__PURE__*/React.createElement("i", null, signed.length ? signed.length + ' من المحتملة' : '—')), /*#__PURE__*/React.createElement("div", {
     className: "kpi"
-  }, /*#__PURE__*/React.createElement("span", null, "مدارس طلعت"), /*#__PURE__*/React.createElement("b", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0645\u062F\u0627\u0631\u0633 \u0637\u0644\u0639\u062A"), /*#__PURE__*/React.createElement("b", {
     className: 'num' + (left.length ? ' bad' : '')
   }, left.length), /*#__PURE__*/React.createElement("i", null, deleted.length ? deleted.length + ' انشالت' : '—'))), nothing && /*#__PURE__*/React.createElement("div", {
     className: "empty"
-  }, /*#__PURE__*/React.createElement("b", null, "ما صار شي بهالفترة"), "غيّر الفترة أو ارجع بعدين."), dayList.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("b", null, "\u0645\u0627 \u0635\u0627\u0631 \u0634\u064A \u0628\u0647\u0627\u0644\u0641\u062A\u0631\u0629"), "\u063A\u064A\u0651\u0631 \u0627\u0644\u0641\u062A\u0631\u0629 \u0623\u0648 \u0627\u0631\u062C\u0639 \u0628\u0639\u062F\u064A\u0646."), dayList.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "sect"
-  }, "الحركة يوم بيوم"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u062D\u0631\u0643\u0629 \u064A\u0648\u0645 \u0628\u064A\u0648\u0645"), /*#__PURE__*/React.createElement("div", {
     className: "daybars"
   }, dayList.map(([d, n]) => /*#__PURE__*/React.createElement("div", {
     className: "daybar",
@@ -7410,11 +7428,11 @@ function StatsPeriod({
     className: "db-n num"
   }, n))))), stats.rows.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "sect"
-  }, "منو سوّى إيش"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0645\u0646\u0648 \u0633\u0648\u0651\u0649 \u0625\u064A\u0634"), /*#__PURE__*/React.createElement("div", {
     className: "sttable"
   }, /*#__PURE__*/React.createElement("div", {
     className: "sthead pd"
-  }, /*#__PURE__*/React.createElement("span", null, "الموظف"), /*#__PURE__*/React.createElement("span", null, "تعديلات"), /*#__PURE__*/React.createElement("span", null, "مهام خلّصها"), /*#__PURE__*/React.createElement("span", null, "مدارس لمسها"), /*#__PURE__*/React.createElement("span", null, "تغيّر إنجاز مدارسه"), /*#__PURE__*/React.createElement("span", null)), stats.rows.map(r => /*#__PURE__*/React.createElement(React.Fragment, {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0627\u0644\u0645\u0648\u0638\u0641"), /*#__PURE__*/React.createElement("span", null, "\u062A\u0639\u062F\u064A\u0644\u0627\u062A"), /*#__PURE__*/React.createElement("span", null, "\u0645\u0647\u0627\u0645 \u062E\u0644\u0651\u0635\u0647\u0627"), /*#__PURE__*/React.createElement("span", null, "\u0645\u062F\u0627\u0631\u0633 \u0644\u0645\u0633\u0647\u0627"), /*#__PURE__*/React.createElement("span", null, "\u062A\u063A\u064A\u0651\u0631 \u0625\u0646\u062C\u0627\u0632 \u0645\u062F\u0627\u0631\u0633\u0647"), /*#__PURE__*/React.createElement("span", null)), stats.rows.map(r => /*#__PURE__*/React.createElement(React.Fragment, {
     key: r.name
   }, /*#__PURE__*/React.createElement("div", {
     className: 'strow pd' + (pick === r.name ? ' on' : ''),
@@ -7437,7 +7455,7 @@ function StatsPeriod({
     className: "detcol"
   }, /*#__PURE__*/React.createElement("div", {
     className: "detttl"
-  }, "تعديلاته بهالفترة ", /*#__PURE__*/React.createElement("em", {
+  }, "\u062A\u0639\u062F\u064A\u0644\u0627\u062A\u0647 \u0628\u0647\u0627\u0644\u0641\u062A\u0631\u0629 ", /*#__PURE__*/React.createElement("em", {
     className: "num"
   }, applied.filter(l => l.by === r.name).length)), applied.filter(l => l.by === r.name).slice(0, 40).map(l => /*#__PURE__*/React.createElement(LogLine, {
     key: l.id,
@@ -7445,9 +7463,9 @@ function StatsPeriod({
     showSchool: true
   })), applied.filter(l => l.by === r.name).length === 0 && /*#__PURE__*/React.createElement("div", {
     className: "hint"
-  }, "ما سوّى تعديلات — بس مدارسه تحرّكت."))))))), topSchools.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, "\u0645\u0627 \u0633\u0648\u0651\u0649 \u062A\u0639\u062F\u064A\u0644\u0627\u062A \u2014 \u0628\u0633 \u0645\u062F\u0627\u0631\u0633\u0647 \u062A\u062D\u0631\u0651\u0643\u062A."))))))), topSchools.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "sect"
-  }, "أكثر المدارس تقدّماً"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0623\u0643\u062B\u0631 \u0627\u0644\u0645\u062F\u0627\u0631\u0633 \u062A\u0642\u062F\u0651\u0645\u0627\u064B"), /*#__PURE__*/React.createElement("div", {
     className: "waitlist"
   }, topSchools.map(({
     s,
@@ -7463,7 +7481,7 @@ function StatsPeriod({
     className: 'wnote num ' + (pct > 0 ? 'ok' : 'bad')
   }, pct > 0 ? '+' : '', pct.toFixed(1), "%"))))), joined.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "sect"
-  }, "مدارس انضمت ", /*#__PURE__*/React.createElement("em", {
+  }, "\u0645\u062F\u0627\u0631\u0633 \u0627\u0646\u0636\u0645\u062A ", /*#__PURE__*/React.createElement("em", {
     className: "num"
   }, joined.length)), /*#__PURE__*/React.createElement("div", {
     className: "waitlist"
@@ -7478,7 +7496,7 @@ function StatsPeriod({
     className: "wnote num ok"
   }, fmtShort(s.joinedAt)))))), left.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "sect"
-  }, "مدارس طلعت ", /*#__PURE__*/React.createElement("em", {
+  }, "\u0645\u062F\u0627\u0631\u0633 \u0637\u0644\u0639\u062A ", /*#__PURE__*/React.createElement("em", {
     className: "num"
   }, left.length)), /*#__PURE__*/React.createElement("div", {
     className: "waitlist"
@@ -7522,7 +7540,7 @@ function ListEd({
     onChange: e => onSet(arr.map((x, j) => j === i ? e.target.value : x))
   }), /*#__PURE__*/React.createElement("button", {
     onClick: () => onSet(arr.filter((_, j) => j !== i))
-  }, "×")))), /*#__PURE__*/React.createElement("div", {
+  }, "\xD7")))), /*#__PURE__*/React.createElement("div", {
     className: "addrow"
   }, /*#__PURE__*/React.createElement("input", {
     value: nv,
@@ -7532,7 +7550,7 @@ function ListEd({
   }), /*#__PURE__*/React.createElement("button", {
     className: "btn",
     onClick: add
-  }, "أضف")));
+  }, "\u0623\u0636\u0641")));
 }
 function NewItem({
   label,
@@ -7553,7 +7571,7 @@ function NewItem({
     type: "checkbox",
     checked: isText,
     onChange: e => setIsText(e.target.checked)
-  }), " حقل نص"), /*#__PURE__*/React.createElement("button", {
+  }), " \u062D\u0642\u0644 \u0646\u0635"), /*#__PURE__*/React.createElement("button", {
     className: "btn grad",
     onClick: () => {
       if (v.trim()) {
@@ -7562,7 +7580,7 @@ function NewItem({
         setIsText(false);
       }
     }
-  }, "أضف"));
+  }, "\u0623\u0636\u0641"));
 }
 function Settings({
   db,
@@ -7609,7 +7627,7 @@ function Settings({
   const TABS = [['users', 'المستخدمون'], ['tasks', 'المهام'], ['fields', 'الخانات المضافة'], ['print', 'المطبوعات'], ['lists', 'القوائم'], ['data', 'البيانات']];
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "phead"
-  }, /*#__PURE__*/React.createElement("h2", null, "الإعدادات")), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("h2", null, "\u0627\u0644\u0625\u0639\u062F\u0627\u062F\u0627\u062A")), /*#__PURE__*/React.createElement("div", {
     className: "tabs2 plain wide"
   }, TABS.map(([k, t]) => /*#__PURE__*/React.createElement("button", {
     key: k,
@@ -7619,13 +7637,13 @@ function Settings({
     className: "setblk"
   }, /*#__PURE__*/React.createElement("div", {
     className: "setttl"
-  }, "المستخدمون والأكواد"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0645\u0633\u062A\u062E\u062F\u0645\u0648\u0646 \u0648\u0627\u0644\u0623\u0643\u0648\u0627\u062F"), /*#__PURE__*/React.createElement("div", {
     className: "hint"
-  }, "أنت تحط الكود بكيفك. الموقّف ما يقدر يدخل بس بياناته تبقى."), /*#__PURE__*/React.createElement("div", {
+  }, "\u0623\u0646\u062A \u062A\u062D\u0637 \u0627\u0644\u0643\u0648\u062F \u0628\u0643\u064A\u0641\u0643. \u0627\u0644\u0645\u0648\u0642\u0651\u0641 \u0645\u0627 \u064A\u0642\u062F\u0631 \u064A\u062F\u062E\u0644 \u0628\u0633 \u0628\u064A\u0627\u0646\u0627\u062A\u0647 \u062A\u0628\u0642\u0649."), /*#__PURE__*/React.createElement("div", {
     className: "utable"
   }, /*#__PURE__*/React.createElement("div", {
     className: "uhead"
-  }, /*#__PURE__*/React.createElement("span", null, "الاسم"), /*#__PURE__*/React.createElement("span", null, "الكود"), /*#__PURE__*/React.createElement("span", null, "الصلاحية"), /*#__PURE__*/React.createElement("span", null, "الحالة"), /*#__PURE__*/React.createElement("span", null, "آخر دخول"), /*#__PURE__*/React.createElement("span", null)), db.users.map(u => /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("span", null, "\u0627\u0644\u0627\u0633\u0645"), /*#__PURE__*/React.createElement("span", null, "\u0627\u0644\u0643\u0648\u062F"), /*#__PURE__*/React.createElement("span", null, "\u0627\u0644\u0635\u0644\u0627\u062D\u064A\u0629"), /*#__PURE__*/React.createElement("span", null, "\u0627\u0644\u062D\u0627\u0644\u0629"), /*#__PURE__*/React.createElement("span", null, "\u0622\u062E\u0631 \u062F\u062E\u0648\u0644"), /*#__PURE__*/React.createElement("span", null)), db.users.map(u => /*#__PURE__*/React.createElement("div", {
     className: "urow",
     key: u.id
   }, /*#__PURE__*/React.createElement("input", {
@@ -7634,39 +7652,39 @@ function Settings({
   }), /*#__PURE__*/React.createElement("input", {
     className: 'ltr' + (dupCode(u.code) ? ' bad' : ''),
     value: u.code,
-    placeholder: "بدون كود",
+    placeholder: "\u0628\u062F\u0648\u0646 \u0643\u0648\u062F",
     onChange: e => setUser(u.id, 'code', e.target.value.trim())
   }), /*#__PURE__*/React.createElement("select", {
     value: u.role,
     onChange: e => setUser(u.id, 'role', e.target.value)
   }, /*#__PURE__*/React.createElement("option", {
     value: "admin"
-  }, "أدمن"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0623\u062F\u0645\u0646"), /*#__PURE__*/React.createElement("option", {
     value: "staff"
-  }, "موظف")), /*#__PURE__*/React.createElement("select", {
+  }, "\u0645\u0648\u0638\u0641")), /*#__PURE__*/React.createElement("select", {
     value: u.active ? '1' : '0',
     onChange: e => setUser(u.id, 'active', e.target.value === '1')
   }, /*#__PURE__*/React.createElement("option", {
     value: "1"
-  }, "مفعّل"), /*#__PURE__*/React.createElement("option", {
+  }, "\u0645\u0641\u0639\u0651\u0644"), /*#__PURE__*/React.createElement("option", {
     value: "0"
-  }, "موقّف")), /*#__PURE__*/React.createElement("span", {
+  }, "\u0645\u0648\u0642\u0651\u0641")), /*#__PURE__*/React.createElement("span", {
     className: "num dim"
   }, u.lastLogin ? fmtShort(u.lastLogin) : '—'), /*#__PURE__*/React.createElement("button", {
     className: "xbtn",
     onClick: () => delUser(u)
-  }, "×")))), db.users.some(u => dupCode(u.code)) && /*#__PURE__*/React.createElement("div", {
+  }, "\xD7")))), db.users.some(u => dupCode(u.code)) && /*#__PURE__*/React.createElement("div", {
     className: "warnbox"
-  }, "فيه كود مكرر — كل واحد لازم كود مختلف."), /*#__PURE__*/React.createElement("button", {
+  }, "\u0641\u064A\u0647 \u0643\u0648\u062F \u0645\u0643\u0631\u0631 \u2014 \u0643\u0644 \u0648\u0627\u062D\u062F \u0644\u0627\u0632\u0645 \u0643\u0648\u062F \u0645\u062E\u062A\u0644\u0641."), /*#__PURE__*/React.createElement("button", {
     className: "btn grad",
     onClick: addUser
-  }, "+ مستخدم")), tab === 'tasks' && /*#__PURE__*/React.createElement("div", {
+  }, "+ \u0645\u0633\u062A\u062E\u062F\u0645")), tab === 'tasks' && /*#__PURE__*/React.createElement("div", {
     className: "setblk"
   }, /*#__PURE__*/React.createElement("div", {
     className: "setttl"
-  }, "المهام"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0645\u0647\u0627\u0645"), /*#__PURE__*/React.createElement("div", {
     className: "hint"
-  }, "الإخفاء ينطبق على الفريق كله. البيانات ما تنمسح — ترجع بدقة وحدة."), cfg.tasks.map((t, i) => /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0625\u062E\u0641\u0627\u0621 \u064A\u0646\u0637\u0628\u0642 \u0639\u0644\u0649 \u0627\u0644\u0641\u0631\u064A\u0642 \u0643\u0644\u0647. \u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A \u0645\u0627 \u062A\u0646\u0645\u0633\u062D \u2014 \u062A\u0631\u062C\u0639 \u0628\u062F\u0642\u0629 \u0648\u062D\u062F\u0629."), cfg.tasks.map((t, i) => /*#__PURE__*/React.createElement("div", {
     className: "cfgrow",
     key: t.k
   }, /*#__PURE__*/React.createElement("input", {
@@ -7692,8 +7710,8 @@ function Settings({
     onClick: () => confirm('تشيل «' + t.t + '» من كل المدارس؟') && up({
       tasks: cfg.tasks.filter((_, j) => j !== i)
     })
-  }, "×"))), /*#__PURE__*/React.createElement(NewItem, {
-    label: "مهمة",
+  }, "\xD7"))), /*#__PURE__*/React.createElement(NewItem, {
+    label: "\u0645\u0647\u0645\u0629",
     askText: true,
     onAdd: (t, isText) => up({
       tasks: [...cfg.tasks, {
@@ -7709,11 +7727,11 @@ function Settings({
     className: "setblk"
   }, /*#__PURE__*/React.createElement("div", {
     className: "setttl"
-  }, "الخانات المضافة"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u062E\u0627\u0646\u0627\u062A \u0627\u0644\u0645\u0636\u0627\u0641\u0629"), /*#__PURE__*/React.createElement("div", {
     className: "hint"
-  }, "الخانات اللي ضفتها لكل المدارس. الخانات الخاصة بمدرسة وحدة تشيلها من داخل المدرسة نفسها."), (cfg.customFields || []).length === 0 && /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u062E\u0627\u0646\u0627\u062A \u0627\u0644\u0644\u064A \u0636\u0641\u062A\u0647\u0627 \u0644\u0643\u0644 \u0627\u0644\u0645\u062F\u0627\u0631\u0633. \u0627\u0644\u062E\u0627\u0646\u0627\u062A \u0627\u0644\u062E\u0627\u0635\u0629 \u0628\u0645\u062F\u0631\u0633\u0629 \u0648\u062D\u062F\u0629 \u062A\u0634\u064A\u0644\u0647\u0627 \u0645\u0646 \u062F\u0627\u062E\u0644 \u0627\u0644\u0645\u062F\u0631\u0633\u0629 \u0646\u0641\u0633\u0647\u0627."), (cfg.customFields || []).length === 0 && /*#__PURE__*/React.createElement("div", {
     className: "empty"
-  }, /*#__PURE__*/React.createElement("b", null, "ما ضفت خانات بعد"), "افتح أي مدرسة واضغط «+ خانة» بآخر أي قسم."), (cfg.customFields || []).map((f, i) => /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("b", null, "\u0645\u0627 \u0636\u0641\u062A \u062E\u0627\u0646\u0627\u062A \u0628\u0639\u062F"), "\u0627\u0641\u062A\u062D \u0623\u064A \u0645\u062F\u0631\u0633\u0629 \u0648\u0627\u0636\u063A\u0637 \xAB+ \u062E\u0627\u0646\u0629\xBB \u0628\u0622\u062E\u0631 \u0623\u064A \u0642\u0633\u0645."), (cfg.customFields || []).map((f, i) => /*#__PURE__*/React.createElement("div", {
     className: "cfgrow",
     key: f.k
   }, /*#__PURE__*/React.createElement("input", {
@@ -7739,18 +7757,18 @@ function Settings({
         counts: e.target.checked
       } : x)
     })
-  }), " بالإنجاز"), /*#__PURE__*/React.createElement("button", {
+  }), " \u0628\u0627\u0644\u0625\u0646\u062C\u0627\u0632"), /*#__PURE__*/React.createElement("button", {
     className: "xbtn",
     onClick: () => confirm('تشيل «' + f.t + '» من كل المدارس؟') && up({
       customFields: cfg.customFields.filter((_, j) => j !== i)
     })
-  }, "×")))), tab === 'print' && /*#__PURE__*/React.createElement("div", {
+  }, "\xD7")))), tab === 'print' && /*#__PURE__*/React.createElement("div", {
     className: "setblk"
   }, /*#__PURE__*/React.createElement("div", {
     className: "setttl"
-  }, "المطبوعات"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0645\u0637\u0628\u0648\u0639\u0627\u062A"), /*#__PURE__*/React.createElement("div", {
     className: "hint"
-  }, "ما تدخل بحسبة الإنجاز."), cfg.printables.map((p, i) => /*#__PURE__*/React.createElement("div", {
+  }, "\u0645\u0627 \u062A\u062F\u062E\u0644 \u0628\u062D\u0633\u0628\u0629 \u0627\u0644\u0625\u0646\u062C\u0627\u0632."), cfg.printables.map((p, i) => /*#__PURE__*/React.createElement("div", {
     className: "cfgrow",
     key: p.k
   }, /*#__PURE__*/React.createElement("input", {
@@ -7763,13 +7781,13 @@ function Settings({
     })
   }), p.qty && /*#__PURE__*/React.createElement("span", {
     className: "tagx"
-  }, "معها عدد"), /*#__PURE__*/React.createElement("button", {
+  }, "\u0645\u0639\u0647\u0627 \u0639\u062F\u062F"), /*#__PURE__*/React.createElement("button", {
     className: "xbtn",
     onClick: () => confirm('تشيل «' + p.t + '»؟') && up({
       printables: cfg.printables.filter((_, j) => j !== i)
     })
-  }, "×"))), /*#__PURE__*/React.createElement(NewItem, {
-    label: "مطبوعة",
+  }, "\xD7"))), /*#__PURE__*/React.createElement(NewItem, {
+    label: "\u0645\u0637\u0628\u0648\u0639\u0629",
     onAdd: t => up({
       printables: [...cfg.printables, {
         k: uid('p'),
@@ -7777,20 +7795,20 @@ function Settings({
       }]
     })
   })), tab === 'lists' && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ListEd, {
-    label: "الفريق",
+    label: "\u0627\u0644\u0641\u0631\u064A\u0642",
     arr: cfg.team,
     onSet: v => up({
       team: v
     }),
-    hint: "الأسماء اللي تنحسب بالإحصائيات. أي شي خارج القائمة يعتبر ملاحظة مؤقتة."
+    hint: "\u0627\u0644\u0623\u0633\u0645\u0627\u0621 \u0627\u0644\u0644\u064A \u062A\u0646\u062D\u0633\u0628 \u0628\u0627\u0644\u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A. \u0623\u064A \u0634\u064A \u062E\u0627\u0631\u062C \u0627\u0644\u0642\u0627\u0626\u0645\u0629 \u064A\u0639\u062A\u0628\u0631 \u0645\u0644\u0627\u062D\u0638\u0629 \u0645\u0624\u0642\u062A\u0629."
   }), /*#__PURE__*/React.createElement(ListEd, {
-    label: "الأنواع",
+    label: "\u0627\u0644\u0623\u0646\u0648\u0627\u0639",
     arr: cfg.types,
     onSet: v => up({
       types: v
     })
   }), /*#__PURE__*/React.createElement(ListEd, {
-    label: "الشركات",
+    label: "\u0627\u0644\u0634\u0631\u0643\u0627\u062A",
     arr: cfg.companies,
     onSet: v => up({
       companies: v
@@ -7799,7 +7817,7 @@ function Settings({
     className: "setblk"
   }, /*#__PURE__*/React.createElement("div", {
     className: "setttl"
-  }, "نص المسؤول الفاضي"), /*#__PURE__*/React.createElement("input", {
+  }, "\u0646\u0635 \u0627\u0644\u0645\u0633\u0624\u0648\u0644 \u0627\u0644\u0641\u0627\u0636\u064A"), /*#__PURE__*/React.createElement("input", {
     className: "one",
     value: cfg.ownerPlaceholder,
     onChange: e => up({
@@ -7809,7 +7827,7 @@ function Settings({
     className: "setblk"
   }, /*#__PURE__*/React.createElement("div", {
     className: "setttl"
-  }, "الدفعات"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u062F\u0641\u0639\u0627\u062A"), /*#__PURE__*/React.createElement("div", {
     className: "pills"
   }, cfg.batches.map((b, i) => /*#__PURE__*/React.createElement("span", {
     className: "pill",
@@ -7824,18 +7842,18 @@ function Settings({
     onClick: () => up({
       batches: cfg.batches.filter((_, j) => j !== i)
     })
-  }, "×"))), /*#__PURE__*/React.createElement("button", {
+  }, "\xD7"))), /*#__PURE__*/React.createElement("button", {
     className: "btn sm",
     onClick: () => up({
       batches: [...cfg.batches, Math.max(...cfg.batches) + 1]
     })
-  }, "+ دفعة")))), tab === 'data' && /*#__PURE__*/React.createElement("div", {
+  }, "+ \u062F\u0641\u0639\u0629")))), tab === 'data' && /*#__PURE__*/React.createElement("div", {
     className: "setblk"
   }, /*#__PURE__*/React.createElement("div", {
     className: "setttl"
-  }, "البيانات"), /*#__PURE__*/React.createElement("div", {
+  }, "\u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A"), /*#__PURE__*/React.createElement("div", {
     className: "hint"
-  }, "نزّل نسخة كاملة قبل أي تغيير كبير. والاستيراد يستبدل كل شي — استخدمه عشان تنقل البيانات لجهاز ثاني."), /*#__PURE__*/React.createElement("div", {
+  }, "\u0646\u0632\u0651\u0644 \u0646\u0633\u062E\u0629 \u0643\u0627\u0645\u0644\u0629 \u0642\u0628\u0644 \u0623\u064A \u062A\u063A\u064A\u064A\u0631 \u0643\u0628\u064A\u0631. \u0648\u0627\u0644\u0627\u0633\u062A\u064A\u0631\u0627\u062F \u064A\u0633\u062A\u0628\u062F\u0644 \u0643\u0644 \u0634\u064A \u2014 \u0627\u0633\u062A\u062E\u062F\u0645\u0647 \u0639\u0634\u0627\u0646 \u062A\u0646\u0642\u0644 \u0627\u0644\u0628\u064A\u0627\u0646\u0627\u062A \u0644\u062C\u0647\u0627\u0632 \u062B\u0627\u0646\u064A."), /*#__PURE__*/React.createElement("div", {
     className: "addrow"
   }, /*#__PURE__*/React.createElement("button", {
     className: "btn",
@@ -7848,9 +7866,9 @@ function Settings({
       a.download = 'schools-backup-' + new Date().toISOString().slice(0, 10) + '.json';
       a.click();
     }
-  }, "نزّل نسخة احتياطية"), /*#__PURE__*/React.createElement("label", {
+  }, "\u0646\u0632\u0651\u0644 \u0646\u0633\u062E\u0629 \u0627\u062D\u062A\u064A\u0627\u0637\u064A\u0629"), /*#__PURE__*/React.createElement("label", {
     className: "btn grad imp"
-  }, "استورد نسخة", /*#__PURE__*/React.createElement("input", {
+  }, "\u0627\u0633\u062A\u0648\u0631\u062F \u0646\u0633\u062E\u0629", /*#__PURE__*/React.createElement("input", {
     type: "file",
     accept: ".json,application/json",
     onChange: e => {
@@ -7895,7 +7913,7 @@ function Settings({
       a.download = 'schools.csv';
       a.click();
     }
-  }, "نزّل كل المدارس CSV"))));
+  }, "\u0646\u0632\u0651\u0644 \u0643\u0644 \u0627\u0644\u0645\u062F\u0627\u0631\u0633 CSV"))));
 }
 function OwnerPick({
   label,
@@ -7957,7 +7975,7 @@ function OwnerPick({
     ref: box
   }, /*#__PURE__*/React.createElement("label", null, label, pending && /*#__PURE__*/React.createElement("em", {
     className: "pend"
-  }, "معلّق")), /*#__PURE__*/React.createElement("div", {
+  }, "\u0645\u0639\u0644\u0651\u0642")), /*#__PURE__*/React.createElement("div", {
     className: "cbox"
   }, /*#__PURE__*/React.createElement("input", {
     className: (pending ? 'pending ' : '') + (txt && !onRoster(txt) ? 'freetxt' : ''),
@@ -7979,8 +7997,8 @@ function OwnerPick({
       setQ(null);
       setAdding(false);
     },
-    "aria-label": "اختر مسؤول"
-  }, "▾"), open && /*#__PURE__*/React.createElement("div", {
+    "aria-label": "\u0627\u062E\u062A\u0631 \u0645\u0633\u0624\u0648\u0644"
+  }, "\u25BE"), open && /*#__PURE__*/React.createElement("div", {
     className: "cbox-pop"
   }, !adding && /*#__PURE__*/React.createElement(React.Fragment, null, quickAdd && /*#__PURE__*/React.createElement("button", {
     type: "button",
@@ -7990,22 +8008,22 @@ function OwnerPick({
       onChange(term);
       close();
     }
-  }, "أضف «", term, "» للفريق"), term && !onRoster(term) && !onAddPerson && /*#__PURE__*/React.createElement("div", {
+  }, "\u0623\u0636\u0641 \xAB", term, "\xBB \u0644\u0644\u0641\u0631\u064A\u0642"), term && !onRoster(term) && !onAddPerson && /*#__PURE__*/React.createElement("div", {
     className: "cbox-note"
-  }, "«", term, "» اسم مؤقت — ما ينحسب على أحد بالإحصائيات"), list.map(o => /*#__PURE__*/React.createElement("button", {
+  }, "\xAB", term, "\xBB \u0627\u0633\u0645 \u0645\u0624\u0642\u062A \u2014 \u0645\u0627 \u064A\u0646\u062D\u0633\u0628 \u0639\u0644\u0649 \u0623\u062D\u062F \u0628\u0627\u0644\u0625\u062D\u0635\u0627\u0626\u064A\u0627\u062A"), list.map(o => /*#__PURE__*/React.createElement("button", {
     type: "button",
     key: o,
     className: 'cbox-o' + (o === txt ? ' on' : ''),
     onClick: () => pick(o)
-  }, o, o === txt && /*#__PURE__*/React.createElement("i", null, "✓"))), list.length === 0 && term && /*#__PURE__*/React.createElement("div", {
+  }, o, o === txt && /*#__PURE__*/React.createElement("i", null, "\u2713"))), list.length === 0 && term && /*#__PURE__*/React.createElement("div", {
     className: "cbox-empty"
-  }, "ما فيه اسم يطابق «", term, "»"), list.length === 0 && !term && /*#__PURE__*/React.createElement("div", {
+  }, "\u0645\u0627 \u0641\u064A\u0647 \u0627\u0633\u0645 \u064A\u0637\u0627\u0628\u0642 \xAB", term, "\xBB"), list.length === 0 && !term && /*#__PURE__*/React.createElement("div", {
     className: "cbox-empty"
-  }, "ما فيه أسماء"), /*#__PURE__*/React.createElement("button", {
+  }, "\u0645\u0627 \u0641\u064A\u0647 \u0623\u0633\u0645\u0627\u0621"), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "cbox-add",
     onClick: startAdd
-  }, "+ أضف اسم جديد"), /*#__PURE__*/React.createElement("button", {
+  }, "+ \u0623\u0636\u0641 \u0627\u0633\u0645 \u062C\u062F\u064A\u062F"), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "cbox-clr",
     onClick: () => pick('')
@@ -8013,10 +8031,10 @@ function OwnerPick({
     className: "cbox-addbox"
   }, /*#__PURE__*/React.createElement("div", {
     className: "cbox-addttl"
-  }, "اسم جديد"), /*#__PURE__*/React.createElement("input", {
+  }, "\u0627\u0633\u0645 \u062C\u062F\u064A\u062F"), /*#__PURE__*/React.createElement("input", {
     autoFocus: true,
     value: draft,
-    placeholder: "اكتب الاسم كامل",
+    placeholder: "\u0627\u0643\u062A\u0628 \u0627\u0644\u0627\u0633\u0645 \u0643\u0627\u0645\u0644",
     onChange: e => setDraft(e.target.value),
     onKeyDown: e => {
       if (e.key === 'Enter') {
@@ -8034,19 +8052,19 @@ function OwnerPick({
     className: "btn grad sm",
     disabled: !draft.trim(),
     onClick: commitTeam
-  }, "أضف للفريق"), /*#__PURE__*/React.createElement("button", {
+  }, "\u0623\u0636\u0641 \u0644\u0644\u0641\u0631\u064A\u0642"), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "btn sm",
     disabled: !draft.trim(),
     onClick: commitTemp
-  }, "خلّها مؤقتة"), /*#__PURE__*/React.createElement("button", {
+  }, "\u062E\u0644\u0651\u0647\u0627 \u0645\u0624\u0642\u062A\u0629"), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "btn sm ghost",
     onClick: () => {
       setAdding(false);
       setDraft('');
     }
-  }, "رجوع")), /*#__PURE__*/React.createElement("div", {
+  }, "\u0631\u062C\u0648\u0639")), /*#__PURE__*/React.createElement("div", {
     className: "cbox-note"
   }, onAddPerson ? '«للفريق» يدخل القائمة وينحسب بالإحصائيات · «مؤقتة» مجرد ملاحظة على هالمدرسة' : 'الاسم ينحفظ كملاحظة — إضافته للفريق للأدمن بس')))));
 }
