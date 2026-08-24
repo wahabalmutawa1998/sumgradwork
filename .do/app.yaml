@@ -1,0 +1,15 @@
+# DigitalOcean App Platform — مواصفة النشر
+# تُستخدم تلقائياً عند إنشاء التطبيق من هذا الريبو، أو يدوياً عبر:
+#   doctl apps create --spec .do/app.yaml
+name: sumgradwork
+region: fra
+static_sites:
+  - name: web
+    github:
+      repo: wahabalmutawa1998/sumgradwork
+      branch: main
+      deploy_on_push: true
+    source_dir: /
+    output_dir: /
+    index_document: index.html
+    error_document: index.html
