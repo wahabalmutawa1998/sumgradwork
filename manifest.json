@@ -1,0 +1,15 @@
+{
+  "name": "متابعة المدارس — SUM × TREND",
+  "short_name": "متابعة المدارس",
+  "dir": "rtl",
+  "lang": "ar",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EDF2F6",
+  "theme_color": "#4DABE3",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>متابعة المدارس — SUM × TREND</title>
 <meta name="theme-color" content="#4DABE3">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="متابعة المدارس">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -4800,7 +4805,7 @@ const CONFIG0 = {
 const USERS0 = [{
   id: 'U1',
   name: 'وهاب',
-  code: '1234',
+  code: '',
   role: 'admin',
   active: true,
   lastLogin: null
@@ -5747,8 +5752,16 @@ function Login({
 }) {
   const [code, setCode] = useState('');
   const [err, setErr] = useState('');
+  /* أول تشغيل: ما فيه ولا كود محفوظ — الأدمن يسوي كوده الحين */
+  const setup = users.every(x => !x.code);
+  const admin = users.find(x => x.role === 'admin') || users[0];
   const go = () => {
-    const u = users.find(x => x.code && x.code === code.trim());
+    const c = code.trim();
+    if (setup) {
+      if (c.length < 4) return setErr('الكود لازم ٤ أرقام على الأقل');
+      return onLogin({ ...admin, code: c, active: true });
+    }
+    const u = users.find(x => x.code && x.code === c);
     if (!u) return setErr('الكود غلط');
     if (!u.active) return setErr('هذا الحساب موقّف — كلّم الأدمن');
     onLogin(u);
@@ -5769,11 +5782,11 @@ function Login({
     src: TRENDLOGO,
     alt: "TREND GRADUATION",
     className: "lg lg-tr"
-  })), /*#__PURE__*/React.createElement("h1", null, "متابعة المدارس"), /*#__PURE__*/React.createElement("p", null, "دخّل الكود حقك"), /*#__PURE__*/React.createElement("input", {
+  })), /*#__PURE__*/React.createElement("h1", null, "متابعة المدارس"), /*#__PURE__*/React.createElement("p", null, setup ? "أول تشغيل — سوِّ كود الأدمن حقك" : "دخّل الكود حقك"), /*#__PURE__*/React.createElement("input", {
     type: "password",
     inputMode: "numeric",
     className: "code",
-    placeholder: "••••",
+    placeholder: setup ? "كود جديد" : "••••",
     value: code,
     onChange: e => {
       setCode(e.target.value);
@@ -5786,7 +5799,7 @@ function Login({
   }, err), /*#__PURE__*/React.createElement("button", {
     className: "btn grad big",
     onClick: go
-  }, "دخول")));
+  }, setup ? "حفظ ودخول" : "دخول")));
 }
 function Schools(ctx) {
   const {
